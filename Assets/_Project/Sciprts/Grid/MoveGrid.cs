@@ -1,10 +1,15 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEditor;
 
+[System.Serializable]
 public class MoveGrid : Gird {
 
-	[SerializeField] private MoveGrid nextGird;
+	public int exp = 1;
+
+	[SerializeField] 
+	private MoveGrid nextGird;
 
 	public MoveGrid NextGird {
 		get {
@@ -13,11 +18,15 @@ public class MoveGrid : Gird {
 	}
 
 	public void ConnectGrid(MoveGrid connectGrid){
-		this.nextGird = connectGrid;
+		nextGird = connectGrid;
+
+		//save serializeField
+		EditorUtility.SetDirty (this);
+
 	}
 
-	public virtual void Arrived(Player player){
-		Debug.Log (player.name + "  Arrived");
+	public virtual bool Arrived(Actor actor){
+		return base.Arrived (actor);
 	}
 		
 }

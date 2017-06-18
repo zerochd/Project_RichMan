@@ -5,8 +5,10 @@ using UnityEngine.UI;
 
 public class EventUI : MonoBehaviour {
 
-	public Text eventText;
-	public Button eventButton;
+	[SerializeField] Text eventText;
+	[SerializeField] Button eventButton;
+
+	GameEvent getEvent;
 
 	void Awake(){
 		Init ();
@@ -27,15 +29,46 @@ public class EventUI : MonoBehaviour {
 		gameObject.SetActive (true);
 	}
 
+	public void Show(GameEvent gameEvent){
+		if (gameEvent == null)
+			return;
+		getEvent = gameEvent;
+		Show (gameEvent.eventDescription);
+
+		Time.timeScale = 0f;
+	}
+
+	public void Hide(){
+		gameObject.SetActive (false);
+	}
+
 	[ContextMenu("Init")]
 	void Init(){
-		eventText = GetComponentInChildren<Text> ();
-		eventButton = GetComponentInChildren<Button> ();
+		if(eventText == null)
+			eventText = GetComponentInChildren<Text> ();
+		if(eventButton == null)
+			eventButton = GetComponentInChildren<Button> ();
 	}
 
 	public void EventExcute(){
 		Debug.Log ("Click");
-		
+		if (getEvent != null) {
+			if (getEvent.eventType == GAME_EVENT_TYPE.GIVE_MONEY) {
+				Debug.Log ("GetEventMoney:" + getEvent.money);
+
+			} else {
+				Debug.Log ("GetEventOther");
+			}
+		}
+
+		Hide ();
+
+		//轮转至下一个玩家
+		if (GameManager.Instance != null) {
+			GameManager.Instance.RoundNextController ();
+		}
+
+		Time.timeScale = 1f;
 	}
 
 }

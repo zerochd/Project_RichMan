@@ -4,13 +4,11 @@ using UnityEngine;
 
 public class Actor : MonoBehaviour {
 
-	// Use this for initialization
-	void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
+	[SerializeField] protected Transform actorTransform;
+
+	public Transform ActorTransform {
+		get {
+			return actorTransform;
+		}
 	}
 }

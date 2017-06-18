@@ -4,29 +4,39 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour {
 
-	public Player controllerPlayer;
+	[SerializeField] Player player;
+
+	public Player PlayerEntry {
+		get {
+			return player;
+		}
+	}
 
 	[SerializeField] int moveStep;
-
 	[SerializeField] bool debugMove;
 
-	void Start(){
-	}
 
 	void Update(){
 			
 		if (debugMove) {
 			debugMove = false;
 
-			moveStep = Random.Range (1, 7);
-			moveStep = 2;
-			MovePlayer (controllerPlayer,moveStep);
+			MovePlayer (player,moveStep);
 
 		}
 
 	}
+		
+
+	public void MovePlayer(int step){
+		MovePlayer (player, step);
+	}
 
 	void MovePlayer(Player player,int step){
+		if (player == null) {
+			Debug.LogError ("no player");
+			return;
+		}
 		player.CalcMoveStep (step);
 	}
 		

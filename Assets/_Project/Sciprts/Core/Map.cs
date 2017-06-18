@@ -15,10 +15,17 @@ public class Map : MonoBehaviour {
 	[ContextMenu("SetNextMoveGridBatch")]
 	void SetNextMoveGridBatch(){
 		for (int i = 0; i < moveGrids.Length -1; i++) {
-			Debug.Log ("moveGird:" + moveGrids [i].name + " connect +" + moveGrids [i + 1].name);
 			moveGrids [i].ConnectGrid (moveGrids [i + 1]);
-//			moveGrids [i].NextGird = moveGrids [i + 1];
 		}
+	}
+
+	public MoveGrid GetNextGrid(int nextIndex){
+		
+		if (nextIndex >= 0 && nextIndex < moveGrids.Length) {
+			return moveGrids [nextIndex];
+		}
+
+		return null;
 	}
 
 }

@@ -7,20 +7,17 @@ public class EventGrid : MoveGrid {
 	[SerializeField]
 	GameEvent gameEvent;
 
-	void Start(){
-	
-	}
 
 	void Init(){
 
 	}
 
-	public override void Arrived (Player player)
+	public override bool Arrived (Actor actor)
 	{
-		Debug.Log ("This is GameEvent:" + player.name + " Arrived");
-
 		if (GUIController.Instance != null) {
 			GUIController.Instance.ShowGameEvent (gameEvent);
 		}
+		return base.Arrived (actor);
+
 	}
 }
