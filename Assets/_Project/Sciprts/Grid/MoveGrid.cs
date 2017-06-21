@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEditor;
 
 [System.Serializable]
-public class MoveGrid : Gird {
+public class MoveGrid : Grid {
 
 	public int exp = 1;
 

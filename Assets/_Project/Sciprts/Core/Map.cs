@@ -4,12 +4,29 @@ using UnityEngine;
 
 public class Map : MonoBehaviour {
 
+	const string GRID_PATH = "Assets/_Project/Prefab/GridPrefab";
+
 	[SerializeField] MoveGrid[] moveGrids;
+	[SerializeField] GameObject moveGridPrefab;
 
 	[ContextMenu("Init")]
-	void Init(){
+	public void Init(){
 
 		moveGrids = GetComponentsInChildren<MoveGrid> ();
+	}
+
+	public void Clear(){
+
+		foreach (MoveGrid mgd in moveGrids) {
+			DestroyImmediate (mgd.gameObject);
+		}
+
+		moveGrids = new MoveGrid[0];
+
+	}
+
+	public GameObject GetGridPrefab(){
+		return moveGridPrefab;
 	}
 
 	[ContextMenu("SetNextMoveGridBatch")]

@@ -7,7 +7,13 @@ public class GoUI : MonoBehaviour {
 
 	const int randomShowNum = 50;
 
-	public static GoUI _instance;
+	static GoUI _instance;
+
+	[SerializeField] Button eventButton;
+	[SerializeField] Text eventText;
+	[SerializeField] PlayerController playerController;
+
+	bool startGO = false;
 
 	public static GoUI Instance {
 		get {
@@ -17,11 +23,6 @@ public class GoUI : MonoBehaviour {
 			return _instance;
 		}
 	}
-		
-	[SerializeField] Button eventButton;
-	[SerializeField] Text eventText;
-
-	[SerializeField] PlayerController playerController;
 
 	public PlayerController PlayerController {
 		set {
@@ -29,11 +30,10 @@ public class GoUI : MonoBehaviour {
 		}
 	}
 
-	bool startGO = false;
-
 	[Header("[DEBUG]")]
 	[SerializeField] int _showFinalResult;
 	[SerializeField] float _showTimeNow;
+
 	void Awake(){
 		_instance = this;
 		Init ();

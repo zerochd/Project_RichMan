@@ -19,6 +19,8 @@ public class GUIController : MonoBehaviour {
 	[SerializeField] EventUI eventUI;
 	[SerializeField] GoUI goUI;
 
+	[SerializeField] IMainUI[] iMainUIArray;
+
 	void Awake(){
 		_instance = this;
 		Init ();
@@ -37,6 +39,10 @@ public class GUIController : MonoBehaviour {
 			eventUI = GetComponentInChildren<EventUI> ();
 		if(goUI == null)
 			goUI = GetComponentInChildren<GoUI> ();
+
+		iMainUIArray = GetComponentsInChildren<IMainUI> ();
+
+		Debug.Log ("ima:" + iMainUIArray.Length);
 	}
 
 	public void UpdatePlayerController(PlayerController playerController){

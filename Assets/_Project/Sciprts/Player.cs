@@ -18,21 +18,24 @@ public class AttackData{
 }
 
 [System.Serializable]
-public struct PlayerData{
-	public int hp;
-	public int damage;
-	public int defense;
-	public int speed;
-	public int level;
-	public int exp;
-	public int nextLevelExp;
+public class PlayerData{
+	public string palyerName;
+	public int hp = 5;
+	public int maxHp = 5;
+	public int damage = 1;
+	public int defense = 0;
+	public int speed = 6;
+	public int money = 0;
+
+
+	public int level = 1;
+	public int exp = 0;
+	public int nextLevelExp = 5;
 
 }
 
 public class Player : Actor
 {
-	public string playerName;
-
 	public PlayerData playerData;
 
 	[SerializeField] MoveGrid standMoveGrid;
@@ -143,7 +146,12 @@ public class Player : Actor
 		moveDone = true;
 
 		SetupBornGrid ();
+
+		if (playerData.hp > playerData.maxHp) {
+			playerData.hp = playerData.maxHp;
+		}
 	}
+		
 
 	void SetupBornGrid(){
 		if (actorTransform == null)
