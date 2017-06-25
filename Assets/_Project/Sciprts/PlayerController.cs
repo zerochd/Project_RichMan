@@ -69,6 +69,8 @@ public class PlayerController : MonoBehaviour
 	}
 
 	void CommandUpdate(){
+
+
 		switch (command) {
 
 		case COMMAND.NONE:
@@ -105,6 +107,10 @@ public class PlayerController : MonoBehaviour
 
 						//press mouse button 0
 						if (Input.GetMouseButtonDown (0)) {
+
+							if (UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject ())
+								return;
+
 							command = COMMAND.DOING;
 
 							hoverGrid.SetGridColor (Color.red);
@@ -180,7 +186,11 @@ public class PlayerController : MonoBehaviour
 
 						if (_grid.owner != null) {
 							if (Input.GetMouseButtonDown (0)) {
-								Debug.Log ("grid.owner:" + _grid.owner.name);
+//								Debug.Log ("grid.owner:" + _grid.owner.name);
+
+								if (UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject ())
+									return;
+
 								command = COMMAND.DOING;
 								PlayerFight (player, _grid.owner);
 								return;
@@ -235,7 +245,7 @@ public class PlayerController : MonoBehaviour
 					}
 
 					#endregion
-
+			
 					Ray _ray = Camera.main.ScreenPointToRay (Input.mousePosition);
 					RaycastHit _hit = new RaycastHit ();
 
@@ -247,7 +257,10 @@ public class PlayerController : MonoBehaviour
 
 						if (_grid.owner == null) {
 							if (Input.GetMouseButtonDown (0)) {
-								
+
+								if (UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject ())
+									return;
+
 //								command = COMMAND.DOING;
 								PlayerBuild (player, _grid);
 								return;
