@@ -42,10 +42,16 @@ public class GUIController : MonoBehaviour {
 
 		iMainUIArray = GetComponentsInChildren<IMainUI> ();
 
-		Debug.Log ("ima:" + iMainUIArray.Length);
+//		Debug.Log ("ima:" + iMainUIArray.Length);
 	}
 
-	public void UpdatePlayerController(PlayerController playerController){
+	public void UpdateMainUI(PlayerData playerData){
+		foreach (IMainUI mainUI in iMainUIArray) {
+			mainUI.UpdateUI (playerData);
+		}
+	}
+
+	public void UpdateGo(PlayerController playerController){
 		if (goUI != null) {
 			goUI.PlayerController = playerController;
 			goUI.CanGo ();

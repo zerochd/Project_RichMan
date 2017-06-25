@@ -50,13 +50,13 @@ public class MyCamera : MonoBehaviour
 	
 	bool CheckCameraEnable ()
 	{
-		if (GameManager.Instance == null) {
-			return false;
-		}
-
-		if (GameManager.Instance.NowControler == null) {
-			return false;
-		}
+//		if (GameManager.Instance == null) {
+//			return false;
+//		}
+//
+//		if (GameManager.Instance.NowControler == null) {
+//			return false;
+//		}
 
 		return true;
 	}
@@ -79,7 +79,7 @@ public class MyCamera : MonoBehaviour
 
 	void MoveCamera_LockTarget ()
 	{
-		Transform targetTransform = GameManager.Instance.NowControler.PlayerEntry.ActorTransform;
+		Transform targetTransform = GameManager.Instance.NowControler.PlayerEntity.ActorTransform;
 
 //		this.transform.LookAt (targetTransform);
 

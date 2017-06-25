@@ -20,9 +20,17 @@ public class HpUI : MonoBehaviour,IMainUI {
 	[SerializeField] Slider hpSlider;
 	[SerializeField] Text hpText;
 
+//	float playerHpPercent;
+
 	void Awake(){
 		_instance = this;
 	}
+
+//	void Update(){
+//		if (hpSlider != null && Mathf.Abs(hpSlider.value - playerHpPercent) > 0.01f) {
+//			hpSlider.value = Mathf.Lerp (hpSlider.value, playerHpPercent, Time.deltaTime);
+//		}
+//	}
 
 	#region IMainUI implementation
 	public void ShowUI ()
@@ -48,6 +56,10 @@ public class HpUI : MonoBehaviour,IMainUI {
 		if (hpText != null) {
 			hpText.text = playerData.hp + "/" + playerData.maxHp;
 		}
+		if (hpSlider != null) {
+			hpSlider.value = (float)playerData.hp / playerData.maxHp;
+		}
+//		playerHpPercent = (float)playerData.hp / playerData.maxHp;
 	}
 	#endregion
 }

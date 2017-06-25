@@ -66,7 +66,7 @@ public class GameManager : MonoBehaviour {
 		m_playerControllerQueue.Enqueue (m_nowControler);
 		m_nowControler = m_playerControllerQueue.Dequeue ();
 		if (GUIController.Instance != null) {
-			GUIController.Instance.UpdatePlayerController (m_nowControler);
+			GUIController.Instance.UpdateGo (m_nowControler);
 		}
 
 	}

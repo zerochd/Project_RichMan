@@ -2,15 +2,18 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class AttackData{
-	public Player attacker;
+public class AttackData
+{
+	public Actor attacker;
 	public Actor attackTarget;
 	public int damage;
 
-	public AttackData(){
+	public AttackData ()
+	{
 	}
 
-	public AttackData(Player attacker,Actor attackTarget,int damage){
+	public AttackData (Actor attacker, Actor attackTarget, int damage)
+	{
 		this.attacker = attacker;
 		this.attackTarget = attackTarget;
 		this.damage = damage;
@@ -18,7 +21,8 @@ public class AttackData{
 }
 
 [System.Serializable]
-public class PlayerData{
+public class PlayerData
+{
 	public string palyerName;
 	public int hp = 5;
 	public int maxHp = 5;
@@ -38,23 +42,30 @@ public class Player : Actor
 {
 	public PlayerData playerData;
 
-	[SerializeField] MoveGrid standMoveGrid;
-	[SerializeField] MoveGrid nextMoveGrid;
+	[SerializeField] Grid standGrid;
+	//	[SerializeField] Grid nextMoveGrid;
 
 	//move one gird speed;
 	[SerializeField] int moveSpeed = 4;
 	[SerializeField] int moveStep;
-	[SerializeField] bool moveDone = true;
-
+	[SerializeField] bool isMoving = false;
 
 	Animator animator;
+
+	Stack<Grid> moveGridStack = new Stack<Grid> ();
+
+	public Grid StandGrid {
+		get {
+			return standGrid;
+		}
+	}
 
 	public int MoveStep {
 		get {
 			return moveStep;
 		}
 	}
-		
+
 	#region unity common function
 
 	void Awake ()
@@ -68,7 +79,6 @@ public class Player : Actor
 
 	void Update ()
 	{
-
 		MoveUpdate ();
 	}
 
@@ -77,64 +87,113 @@ public class Player : Actor
 
 	void MoveUpdate ()
 	{
+		//是否正在移动
+
+		if (isMoving) {
+
+			Grid _nextMoveGrid = null;
+
+			if (moveGridStack.Count > 0) {
 		
-		if (moveStep > 0) {
-			
-			if (standMoveGrid != null)
-				nextMoveGrid = standMoveGrid.NextGird;
-
-
-			if (MoveDone ()) {
+				_nextMoveGrid = moveGridStack.Peek ();
 				
-				if (moveDone == false) {
+//				Debug.Log (Time.time + "nextMoveGrid:" + _nextMoveGrid.name);
+
+				if (MoveDone (_nextMoveGrid)) {
+
 					Anim_Idle ();
-					GetExp (nextMoveGrid.exp);
+
+					standGrid = _nextMoveGrid;
+					moveGridStack.Pop ();
+
+					if (moveGridStack.Count <= 0)
+						standGrid.Arrived (this);
+				} else {
+
+
+//					Anim_Turn (_nextMoveGrid);
+					Anim_Move ();
+
+					if (_nextMoveGrid.owner == null)
+						MoveToGrid (_nextMoveGrid);
 				}
-
-				moveDone = true;
-
-				standMoveGrid = nextMoveGrid;
-				moveStep--;
-
-				//excute 
-				if (moveStep == 0 && standMoveGrid != null) {
-					standMoveGrid.Arrived (this);
-
-					if (standMoveGrid is MoveGrid) {
-						//轮转至下一个玩家
-						if (GameManager.Instance != null) {
-							GameManager.Instance.RoundNextController ();
-						}
-					}
-
-				}
-					
 
 			} else {
 
-				if (moveDone == true) {
+				if (!MoveDone (_nextMoveGrid))
+					return;
 
-					Anim_Turn (nextMoveGrid);
-
-					Anim_Move ();
+				if (PlayerController.Instance != null) {
+					PlayerController.Instance.PlayerMoveDone ();
 				}
-
-				moveDone = false;
-
-				if (nextMoveGrid.owner != null) {
-					Fight (nextMoveGrid.owner);
-				} else {
-					MoveToGrid (nextMoveGrid);
-				}
-			}
 				
-		} else {
-			
-			Anim_Idle ();
+				Anim_Idle ();
+
+				isMoving = false;
+				_nextMoveGrid = null;
+			}
 		}
+
+
+
+
+//		if (moveStep > 0) {
+//			
+//			if (standGrid != null)
+//				nextMoveGrid = standGrid.NextGird;
+//
+//
+//			if (MoveDone ()) {
+//				
+//				if (isMoving == false) {
+//					Anim_Idle ();
+//					GetExp (nextMoveGrid.exp);
+//				}
+//
+//				isMoving = true;
+//
+//				standGrid = nextMoveGrid;
+//				moveStep--;
+//
+//				//excute 
+//				if (moveStep == 0 && standGrid != null) {
+//					standGrid.Arrived (this);
+//
+//					if (standGrid is MoveGrid) {
+//						//轮转至下一个玩家
+//						if (GameManager.Instance != null) {
+//							GameManager.Instance.RoundNextController ();
+//						}
+//					}
+//
+//				}
+//					
+//
+//			} else {
+//
+//				if (isMoving == true) {
+//
+//					Anim_Turn (nextMoveGrid);
+//
+//					Anim_Move ();
+//				}
+//
+//				isMoving = false;
+//
+//				if (nextMoveGrid.owner != null) {
+//					Fight (nextMoveGrid.owner);
+//				} else {
+//					MoveToGrid (nextMoveGrid);
+//				}
+//			}
+//				
+//		} else {
+//			
+//			Anim_Idle ();
+//		}
 	}
 
-	[ContextMenu("Init")]
+	[ContextMenu ("Init")]
 	void Init ()
 	{
 		animator = GetComponentInChildren<Animator> ();
@@ -143,39 +202,44 @@ public class Player : Actor
 			actorTransform = animator.transform;
 		}
 
-		moveDone = true;
+		isMoving = false;
 
 		SetupBornGrid ();
 
 		if (playerData.hp > playerData.maxHp) {
 			playerData.hp = playerData.maxHp;
 		}
-	}
-		
 
-	void SetupBornGrid(){
+		if (GUIController.Instance != null) {
+			GUIController.Instance.UpdateMainUI (playerData);
+		}
+	}
+
+
+	void SetupBornGrid ()
+	{
 		if (actorTransform == null)
 			return;
 
 		RaycastHit _hit;
-
-		if(Physics.Raycast(actorTransform.position + actorTransform.up * 0.2f,actorTransform.up * (-1f),out _hit,2f,1 << LayerMask.NameToLayer("Grid"))){
-			MoveGrid _mg = _hit.collider.GetComponent<MoveGrid> ();
-			standMoveGrid = _mg;
-			standMoveGrid.Arrived (this);
+		if (Physics.Raycast (actorTransform.position + actorTransform.up * 5f, actorTransform.up * (-1f), out _hit, 100f, 1 << LayerMask.NameToLayer ("Grid"))) {
+			Grid _mg = _hit.collider.GetComponentInParent<Grid> ();
+			standGrid = _mg;
+			standGrid.Arrived (this);
 		}
 	}
 
-	public void MoveToGrid (MoveGrid nextMoveGrid)
+	public void MoveToGrid (Grid nextGrid)
 	{
-		if (standMoveGrid != null) {
-			standMoveGrid.Reset ();
-		}
-
-		if (nextMoveGrid == null)
+		if (nextGrid == null)
 			return;
 
-		this.actorTransform.position = Vector3.MoveTowards (this.actorTransform.position, nextMoveGrid.transform.position, moveSpeed * Time.deltaTime);
+		if (standGrid != null) {
+			standGrid.Free ();
+			standGrid = null;
+		}
+
+		this.actorTransform.position = Vector3.MoveTowards (this.actorTransform.position, nextGrid.transform.position, moveSpeed * Time.deltaTime);
 
 	}
 
@@ -183,17 +247,30 @@ public class Player : Actor
 	public void CalcMoveStep (int step)
 	{
 		moveStep = step;
-
 	}
 
-	bool MoveDone ()
+	public void GetMoveStack (Stack<Grid> moveGridStack)
 	{
-		if (actorTransform == null || nextMoveGrid == null)
+		this.moveGridStack = moveGridStack;
+
+//		Debug.Log ("called: " + this.moveGridStack.Count);
+		isMoving = true;
+	}
+
+	bool MoveDone (Grid nextGrid)
+	{
+		if (actorTransform == null) {
+			Debug.LogError ("no actorTransform");
 			return true;
+		}
 
-		Vector3 _actorTransform_noY = new Vector3 (actorTransform.position.x, nextMoveGrid.transform.position.y, actorTransform.position.z);
+		if (nextGrid == null) {
+			return true;
+		}
 
-		float _distance = Vector3.Distance (nextMoveGrid.transform.position, _actorTransform_noY);
+		Vector3 _actorTransform_noY = new Vector3 (actorTransform.position.x, nextGrid.transform.position.y, actorTransform.position.z);
+
+		float _distance = Vector3.Distance (nextGrid.transform.position, _actorTransform_noY);
 
 		if (_distance <= float.Epsilon + 0.01f) {
 			return true;
@@ -202,26 +279,54 @@ public class Player : Actor
 		return false;
 	}
 
-	public bool Fight(Actor owner){
-		if (owner is Enemy) {
-			Enemy _enemy = owner as Enemy;
-			AttackData _attackdata = new AttackData (this, _enemy, playerData.damage);
-			_enemy.UnderAttack (_attackdata);
+	public bool Fight (Actor other)
+	{
+		if (other is Enemy) {
+			
+			Enemy _enemy = other as Enemy;
+			AttackData _attackData = new AttackData (this, _enemy, playerData.damage);
+//			AttackData _enemyAttackData = new AttackData (_enemy, this, _enemy.enemyData.damage);
+			_enemy.UnderAttack (_attackData);
+//			this.UnderAttack (_enemyAttackData);
+
+			if (GUIController.Instance != null) {
+				GUIController.Instance.UpdateMainUI (playerData);	
+			}
 
 			return true;
-		} else if (owner is Player) {
+		} else if (other is Player) {
 		
 		}
 
 		return false;
 	}
 
-	public void GetExp(int exp){
+	public void UnderAttack (AttackData attackData)
+	{
+		int _finalDamage = attackData.damage - playerData.defense;
+		if (_finalDamage < 0)
+			_finalDamage = 0;
+		playerData.hp -= _finalDamage;
+
+		if (playerData.hp < 0) {
+			Dead ();
+		}
+			
+	}
+
+	public void Dead ()
+	{
+		
+	}
+
+	public void GetExp (int exp)
+	{
 		playerData.exp += exp;
 		LevelUP ();
 	}
 
-	public void LevelUP(){
+	public void LevelUP ()
+	{
 
 		if (playerData.exp >= playerData.nextLevelExp) {
 			playerData.level++;
@@ -239,7 +344,8 @@ public class Player : Actor
 		return _stateInfo.IsName ("Idle");
 	}
 
-	void Anim_Turn(MoveGrid nextGird){
+	void Anim_Turn (Grid nextGird)
+	{
 
 		Vector3 _direction_player_2_targetPosition = nextGird.transform.position - actorTransform.position;
 
@@ -260,23 +366,17 @@ public class Player : Actor
 
 	}
 
-	void Anim_Move(){
-
-//		if (!isAnimationIdle ())
-//			return;
-		
-		animator.SetBool ("move",true);
+	void Anim_Move ()
+	{
+		animator.SetBool ("move", true);
 	}
 
-	void Anim_Idle()
+	void Anim_Idle ()
 	{
 		animator.SetBool ("move", false);
 	}
 
 	#endregion
-	//	IEnumerator MoveCor(int step){
-	//
-	//
-	//	}
+
 
 }

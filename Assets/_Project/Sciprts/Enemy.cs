@@ -16,7 +16,7 @@ public class Enemy : Actor {
 
 	public EnemyData enemyData;
 
-	[SerializeField] MoveGrid standMoveGrid;
+	[SerializeField] Grid standGrid;
 	[SerializeField] bool moveDone = true;
 
 	Animator animator;
@@ -45,10 +45,10 @@ public class Enemy : Actor {
 		if (_finalDamage < 0)
 			_finalDamage = 0;
 		enemyData.hp -= _finalDamage;
-		if (enemyData.hp < 0) {
+		if (enemyData.hp <= 0) {
 
 			if (attackData.attacker != null) {
-				attackData.attacker.GetExp (enemyData.exp);
+				attackData.attacker.SendMessage ("GetExp", enemyData.exp, SendMessageOptions.DontRequireReceiver);
 			}
 
 			Dead ();
@@ -56,8 +56,9 @@ public class Enemy : Actor {
 	}
 
 	public virtual void Dead(){
-		standMoveGrid.Reset ();
-		standMoveGrid = null;
+		Debug.Log ("dead");
+		standGrid.ResetValue ();
+		standGrid = null;
 		actorTransform.gameObject.SetActive (false);
 	}
 
@@ -65,11 +66,11 @@ public class Enemy : Actor {
 		if (actorTransform == null)
 			return;
 		RaycastHit _hit;
-		if (Physics.Raycast (actorTransform.position + actorTransform.up * 0.2f, actorTransform.up * (-1f), out _hit, 3f, 1 << LayerMask.NameToLayer ("Grid"))) {
+		if (Physics.Raycast (actorTransform.position + actorTransform.up * 5f, actorTransform.up * (-1f), out _hit, 100f, 1 << LayerMask.NameToLayer ("Grid"))) {
 			
-			MoveGrid _mg = _hit.collider.GetComponent<MoveGrid> ();
-			standMoveGrid = _mg;
-			standMoveGrid.Arrived (this);
+			Grid _mg = _hit.collider.GetComponentInParent<Grid> ();
+			standGrid = _mg;
+			standGrid.Arrived (this);
 		} 
 	}
 }

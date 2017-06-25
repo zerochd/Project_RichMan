@@ -10,6 +10,7 @@ using UnityEditor;
 public class MapEditor : Editor {
 
 	public static Vector3 CurrentHandlePosition = Vector3.zero;
+	public static Vector3 CurrentHandleNormal = Vector3.up;
 
 	static readonly EditorApplication.HierarchyWindowItemCallback hiearchyItemCallBack;
 
@@ -128,10 +129,10 @@ public class MapEditor : Editor {
 
 		if(!button_edit) return;
 
-		CheckHoverGrid ();
 
 		UpdateHandlePosition ();
 
+		CheckHoverGrid ();
 		UpdateRepaint ();
 		DrawHandlesPreview ();
 		EventUpdate ();
@@ -139,18 +140,13 @@ public class MapEditor : Editor {
 
 	//确认是否hover一个MovePoint
 	static void CheckHoverGrid(){
-		if(Event.current.shift == true){
-
-			Ray ray = HandleUtility.GUIPointToWorldRay( Event.current.mousePosition );
-			RaycastHit hit = new RaycastHit();
-			if (Physics.Raycast(ray, out hit, 1000.0f,1 << LayerMask.NameToLayer("Grid"))) {
-				MoveGrid _hoverGrid = hit.collider.GetComponent<MoveGrid>();
-				if(hoverGrid){
-					hoverGrid = hoverGrid;
-				}
-				else{
-					hoverGrid = null;
-				}
+//		Ray ray = HandleUtility.GUIPointToWorldRay( Event.current.mousePosition );
+		Ray _ray = new Ray (CurrentHandlePosition + Vector3.up * (-20f), CurrentHandleNormal);  
+		RaycastHit hit = new RaycastHit();
+		if (Physics.Raycast(_ray, out hit, 1000.0f,1 << LayerMask.NameToLayer("Grid"))) {
+			Grid _hoverGrid = hit.collider.GetComponentInParent<Grid>();
+			if(_hoverGrid){
+				hoverGrid = _hoverGrid;
 			}
 			else{
 				hoverGrid = null;
@@ -179,14 +175,15 @@ public class MapEditor : Editor {
 			Vector3 offset = Vector3.zero;
 
 			CurrentHandlePosition = _hit.point;
-//			CurrentHandleNormal = _hit.normal;
+			CurrentHandleNormal = _hit.normal;
+
 			offset = _hit.normal;
 
 //			CurrentHandlePosition.x = Mathf.Floor( _hit.point.x - _hit.normal.x * 0.001f + offset.x );
 			CurrentHandlePosition.y = Mathf.Floor( _hit.point.y - _hit.normal.y * 0.001f + offset.y );
 //			CurrentHandlePosition.z = Mathf.Floor( _hit.point.z - _hit.normal.z * 0.001f + offset.z );
-			CurrentHandlePosition.x = Mathf.Round(CurrentHandlePosition.x / 4) * 4;
-			CurrentHandlePosition.z = Mathf.Round(CurrentHandlePosition.z / 4) * 4;
+			CurrentHandlePosition.x = Mathf.RoundToInt(CurrentHandlePosition.x / 4) * 4;
+			CurrentHandlePosition.z = Mathf.RoundToInt(CurrentHandlePosition.z / 4) * 4;
 
 			CurrentHandlePosition += Vector3.up * 0.5f;
 		}
@@ -200,34 +197,39 @@ public class MapEditor : Editor {
 		int controlId = GUIUtility.GetControlID(FocusType.Passive);
 
 		if(Event.current.type == EventType.MouseDown &&
-			Event.current.button == 0)
+			 Event.current.button == 0)
 		{
 			//删除
-			if(hoverGrid != null){
+			if (hoverGrid != null) {
 
-				Undo.DestroyObjectImmediate(hoverGrid.gameObject);
-				return;
-			}
+				if (Event.current.shift == true) {
 
-			//添加
-			if(map.GetGridPrefab() != null){
+					Undo.DestroyObjectImmediate (hoverGrid.gameObject);
+					return;
+				}
+			} else {
 
-				GameObject _go = Instantiate(map.GetGridPrefab());
-				_go.transform.position = CurrentHandlePosition + Vector3.up * 0.5f;
+				//添加
+				if (map.GetGridPrefab () != null) {
+
+//					GameObject _go = Instantiate (map.GetGridPrefab ());
+					GameObject _go = PrefabUtility.InstantiatePrefab (map.GetGridPrefab ()) as GameObject;
+					_go.transform.position = CurrentHandlePosition + Vector3.up * 0.5f;
 //				_go.transform.localEulerAngles = Vector3.up * angle;
 
-				_go.transform.SetParent(map.transform);
-				_go.name = _go.name.Replace("(Clone)","") + _go.transform.GetSiblingIndex();
-				_go.transform.localScale = Vector3.one;
+					_go.transform.SetParent (map.transform);
+					_go.name = _go.name.Replace ("(Clone)", "") + _go.transform.GetSiblingIndex ();
+					_go.transform.localScale = Vector3.one;
 
+					Undo.RegisterCreatedObjectUndo (_go, "Create go");
 
-				Undo.RegisterCreatedObjectUndo(_go,"Create go");
+					EditorUtility.SetDirty (_go);
 
-				EditorUtility.SetDirty(_go);
+				} else {
+					
+					EditorUtility.DisplayDialog ("Warning", "MovePointPrefab is missing", "ok");
 
-			}
-			else{
-				EditorUtility.DisplayDialog("Warning","MovePointPrefab is missing","ok");
+				}
 			}
 
 		}
@@ -239,11 +241,19 @@ public class MapEditor : Editor {
 
 	static void DrawHandlesPreview(){
 		Color _handleColor = Color.green;
+
+		if (Event.current.shift == true && hoverGrid != null) {
+			_handleColor = Color.red;
+		}
+
 		Handles.color = _handleColor;
 		DrawHandle(CurrentHandlePosition);
 	}
 
 	static void DrawHandle(Vector3 center){
+
+
+
 		Vector3 p1 = center + Vector3.up * 0.5f + Vector3.right * 2f + Vector3.forward * 2f;
 		Vector3 p2 = center + Vector3.up * 0.5f + Vector3.right * 2f - Vector3.forward * 2f;
 		Vector3 p3 = center + Vector3.up * 0.5f - Vector3.right * 2f - Vector3.forward * 2f;

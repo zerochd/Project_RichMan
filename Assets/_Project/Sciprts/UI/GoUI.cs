@@ -60,7 +60,7 @@ public class GoUI : MonoBehaviour {
 
 			startGO = true;
 			int _speed = 0;
-			_speed = playerController.PlayerEntry.playerData.speed + 1;
+			_speed = playerController.PlayerEntity.playerData.speed + 1;
 			StartCoroutine(GO_Cor(_speed,3f));
 		}
 	}
