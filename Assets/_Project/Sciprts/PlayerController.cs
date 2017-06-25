@@ -65,6 +65,10 @@ public class PlayerController : MonoBehaviour
 		if (player == null)
 			return;
 
+		CommandUpdate ();
+	}
+
+	void CommandUpdate(){
 		switch (command) {
 
 		case COMMAND.NONE:
@@ -75,8 +79,12 @@ public class PlayerController : MonoBehaviour
 				Ray _ray = Camera.main.ScreenPointToRay (Input.mousePosition);
 				RaycastHit _hit = new RaycastHit ();
 
-				if (Physics.Raycast (_ray, out _hit, 1000f, 1 << LayerMask.NameToLayer ("Grid"))) {
+				if (Physics.Raycast (_ray, out _hit, 1000f)) {
 					Grid _grid = _hit.collider.GetComponentInParent<Grid> ();
+
+					if (_grid == null)
+						return;
+
 					if (_grid.owner == null) {
 
 						if (hoverGrid && hoverGrid != _grid) {
@@ -126,7 +134,6 @@ public class PlayerController : MonoBehaviour
 					#region show AttackRange
 
 					//获得玩家所在grid的坐标
-
 					VectorInt2 _playerVi = player.StandGrid.Vi;
 
 					//获得攻击范围数据(fake temp)
@@ -134,7 +141,7 @@ public class PlayerController : MonoBehaviour
 					int _index = 0;
 					for (int i = -1; i <= 1; i++) {
 						for (int j = -1; j <= 1; j++) {
-						
+
 							if (i == j || i == -j)
 								continue;
 
@@ -165,8 +172,12 @@ public class PlayerController : MonoBehaviour
 					Ray _ray = Camera.main.ScreenPointToRay (Input.mousePosition);
 					RaycastHit _hit = new RaycastHit ();
 
-					if (Physics.Raycast (_ray, out _hit, 1000f, 1 << LayerMask.NameToLayer ("Grid"))) {
+					if (Physics.Raycast (_ray, out _hit, 1000f)) {
 						Grid _grid = _hit.collider.GetComponentInParent<Grid> ();
+
+						if (_grid == null)
+							return;
+
 						if (_grid.owner != null) {
 							if (Input.GetMouseButtonDown (0)) {
 								Debug.Log ("grid.owner:" + _grid.owner.name);
@@ -184,6 +195,69 @@ public class PlayerController : MonoBehaviour
 			break;
 		case COMMAND.BUILD:
 			{
+				if (map != null && player.StandGrid != null) {
+
+					#region show build range
+
+					//获得玩家所在grid的坐标
+					VectorInt2 _playerVi = player.StandGrid.Vi;
+
+					//获得建造范围数据(fake temp)
+					VectorInt2[] _buildViArray = new VectorInt2[4];
+					int _index = 0;
+					for (int i = -1; i <= 1; i++) {
+						for (int j = -1; j <= 1; j++) {
+
+							if (i == j || i == -j)
+								continue;
+
+							_buildViArray [_index] = new VectorInt2 (i, j);
+							_index++;
+
+							if (_index >= _buildViArray.Length)
+								break;
+						}
+					}
+
+					foreach (var _buildVi in _buildViArray) { 
+						VectorInt2 _resultBuildVi = _playerVi + _buildVi;
+						if (_resultBuildVi < VectorInt2.Zero || _resultBuildVi > (map.Edge - VectorInt2.One)) {
+							continue;
+						}
+						if (map.gridMat [_resultBuildVi.x, _resultBuildVi.y] is BuildGrid) {
+							continue;
+						}
+
+						map.gridMat [_resultBuildVi.x, _resultBuildVi.y].SetGridColor (Color.green);
+
+
+
+					}
+
+					#endregion
+
+					Ray _ray = Camera.main.ScreenPointToRay (Input.mousePosition);
+					RaycastHit _hit = new RaycastHit ();
+
+					if (Physics.Raycast (_ray, out _hit, 1000f)) {
+						Grid _grid = _hit.collider.GetComponentInParent<Grid> ();
+
+						if (_grid == null)
+							return;
+
+						if (_grid.owner == null) {
+							if (Input.GetMouseButtonDown (0)) {
+								
+//								command = COMMAND.DOING;
+								PlayerBuild (player, _grid);
+								return;
+							}
+
+						}
+
+					}
+
+				}
 			}
 			break;
 		case COMMAND.DEFENSE:
@@ -212,6 +286,10 @@ public class PlayerController : MonoBehaviour
 
 	public void ApplyCommand (COMMAND applyCommand)
 	{
+		if (map != null) {
+			map.ResetColor ();
+		}
+
 		this.command = applyCommand;
 	}
 
@@ -247,6 +325,15 @@ public class PlayerController : MonoBehaviour
 			return;
 		}
 		player.Fight (other);
+	}
+
+	void PlayerBuild(Player player,Grid grid){
+		if (player == null) {
+			Debug.LogError ("no player");
+			return;
+		}
+
+//		GUIController.Instance.ShowGameEvent
 	}
 
 	#endregion

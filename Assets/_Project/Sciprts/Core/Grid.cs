@@ -73,8 +73,8 @@ public class Grid : MonoBehaviour,IComparable<Grid> {
 	public int h;
 
 	public Grid gridParent;
-
 	public Actor owner;
+	public Color lastColor = Color.white;
 
 	public VectorInt2 Vi {
 		get {
@@ -96,7 +96,9 @@ public class Grid : MonoBehaviour,IComparable<Grid> {
 	}
 
 	public void SetGridColor(Color color){
-		GetComponentInChildren<MeshRenderer> ().material.color = color;
+		Material _mat = GetComponentInChildren<MeshRenderer> ().material;
+		lastColor = _mat.color;
+		_mat.color = color;
 	}
 
 	public void ResetValue(){

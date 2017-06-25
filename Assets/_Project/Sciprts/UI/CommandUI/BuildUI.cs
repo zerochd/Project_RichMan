@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEditor;
 
-public class MoveUI : MonoBehaviour,ICommandUI {
+public class BuildUI : MonoBehaviour,ICommandUI {
 
 	[SerializeField] Button eventButton;
 	[SerializeField] Text eventText;
@@ -17,7 +17,7 @@ public class MoveUI : MonoBehaviour,ICommandUI {
 		if(eventButton != null)
 		{
 			eventButton.onClick.AddListener (delegate {
-//				Debug.Log("click");
+				//				Debug.Log("click");
 				Excute();
 			});
 		}
@@ -45,7 +45,8 @@ public class MoveUI : MonoBehaviour,ICommandUI {
 			CommandController.Instance.Use (this);
 		}
 
-		PlayerController.Instance.ApplyCommand (PlayerController.COMMAND.MOVE);
+		PlayerController.Instance.ApplyCommand (PlayerController.COMMAND.BUILD);
+
 		if(this.eventButton)
 			this.eventButton.interactable = false;
 	}
@@ -68,7 +69,7 @@ public class MoveUI : MonoBehaviour,ICommandUI {
 		}
 
 		#if UNITY_EDITOR
-			EditorUtility.SetDirty(this.gameObject);
+		EditorUtility.SetDirty(this.gameObject);
 		#endif
 	}
 }

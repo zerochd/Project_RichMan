@@ -27,7 +27,8 @@ public class AttackUI : MonoBehaviour,ICommandUI {
 
 	public bool CanExcute ()
 	{
-		if (PlayerController.Instance.Command == PlayerController.COMMAND.NONE)
+		if (PlayerController.Instance.Command != PlayerController.COMMAND.DONE 
+			&& PlayerController.Instance.Command != PlayerController.COMMAND.DOING)
 			return true;
 		return false;
 	}
@@ -40,8 +41,18 @@ public class AttackUI : MonoBehaviour,ICommandUI {
 		if (!CanExcute())
 			return;
 
+		if (CommandController.Instance != null) {
+			CommandController.Instance.Use (this);
+		}
+
 		PlayerController.Instance.ApplyCommand (PlayerController.COMMAND.ATTACK);
-		this.eventButton.interactable = false;
+		if(this.eventButton)
+			this.eventButton.interactable = false;
+	}
+
+	public void EnableCommand(){
+		if(this.eventButton)
+			this.eventButton.interactable = true;
 	}
 
 	#endregion

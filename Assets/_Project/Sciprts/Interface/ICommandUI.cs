@@ -8,5 +8,5 @@ public interface ICommandUI {
 
 	void Excute();
 
-
+	void EnableCommand ();
 }

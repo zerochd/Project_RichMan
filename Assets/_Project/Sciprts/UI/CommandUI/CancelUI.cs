@@ -37,10 +37,19 @@ public class CancelUI : MonoBehaviour,ICommandUI {
 		if (PlayerController.Instance == null)
 			return;
 
-		if (!CanExcute())
-			return;
+//		if (!CanExcute())
+//			return;
+
+		if (CommandController.Instance != null) {
+			CommandController.Instance.Use (this);
+		}
 
 		PlayerController.Instance.ApplyCommand (PlayerController.COMMAND.NONE);
+	}
+
+	public void EnableCommand(){
+		if(this.eventButton)
+			this.eventButton.interactable = true;
 	}
 
 	#endregion

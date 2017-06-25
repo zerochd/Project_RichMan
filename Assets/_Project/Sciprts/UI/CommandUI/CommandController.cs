@@ -18,7 +18,13 @@ public class CommandController : MonoBehaviour {
 	[SerializeField] PlayerController playerController;
 	[SerializeField] ICommandUI[] iCommandUIArray;
 
+	ICommandUI lastCommandUI;
 
+	public ICommandUI LastCommandUI {
+		get {
+			return lastCommandUI;
+		}
+	}
 
 	void Awake(){
 		_instance = this;
@@ -38,6 +44,11 @@ public class CommandController : MonoBehaviour {
 	}
 
 	public void Use(ICommandUI commadUI){
-	
+		
+		if (lastCommandUI != null && lastCommandUI != commadUI) {
+			lastCommandUI.EnableCommand ();
+		}
+
+		lastCommandUI = commadUI;
 	}
 }
