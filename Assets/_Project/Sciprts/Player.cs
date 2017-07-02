@@ -279,27 +279,33 @@ public class Player : Actor
 		return false;
 	}
 
-	public bool Fight (Actor other)
+	AttackData attackData;
+	public void Fight (Actor other)
 	{
-		if (other is Enemy) {
-			
-			Enemy _enemy = other as Enemy;
-			AttackData _attackData = new AttackData (this, _enemy, playerData.damage);
-//			AttackData _enemyAttackData = new AttackData (_enemy, this, _enemy.enemyData.damage);
-			_enemy.UnderAttack (_attackData);
-//			this.UnderAttack (_enemyAttackData);
+		attackData = new AttackData (this, other, playerData.damage);
+		animator.SetInteger("AttackID",1);
+		animator.SetTrigger("once");
 
-			if (GUIController.Instance != null) {
-				GUIController.Instance.UpdateMainUI (playerData);	
-			}
+//		if (other is Enemy) {
+//			
+//			Enemy _enemy = other as Enemy;
+//			AttackData _attackData = new AttackData (this, _enemy, playerData.damage);
+//			_enemy.UnderAttack (_attackData);
+//			if (GUIController.Instance != null) {
+//				GUIController.Instance.UpdateMainUI (playerData);	
+//			}
+//
+//			return true;
+//		} else if (other is Player) {
+//		
+//		}
+//
+//		return false;
 
-			return true;
-		} else if (other is Player) {
-		
-		}
 
-		return false;
 	}
+
+
 
 	public void UnderAttack (AttackData attackData)
 	{
@@ -374,6 +380,34 @@ public class Player : Actor
 	void Anim_Idle ()
 	{
 		animator.SetBool ("move", false);
+	}
+
+
+	//message-function
+	void AttackEnd(){
+
+//		Debug.Log("called");
+
+		if(attackData == null)
+			return;
+
+//		Debug.Log("attackTarget:"+attackData.attackTarget.name);
+//		Debug.Log("attackTarget is:"+attackData.attackTarget is Enemy);
+
+
+		if (attackData.attackTarget is Enemy) {
+						
+			Debug.Log("is enemy");
+			Enemy _enemy = attackData.attackTarget  as Enemy;
+			AttackData _attackData = new AttackData (this, _enemy, playerData.damage);
+			_enemy.UnderAttack (_attackData);
+			if (GUIController.Instance != null) {
+				GUIController.Instance.UpdateMainUI (playerData);	
+			}
+
+		} else if (attackData.attackTarget  is Player) {
+		
+		}
 	}
 
 	#endregion
