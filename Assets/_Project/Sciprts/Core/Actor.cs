@@ -11,4 +11,8 @@ public class Actor : MonoBehaviour {
 			return actorTransform;
 		}
 	}
+
+	public virtual void UnderAttack(AttackData attackData){
+		
+	}
 }

@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+	
 
 	public enum COMMAND
 	{
@@ -25,6 +26,8 @@ public class PlayerController : MonoBehaviour
 		//结束
 	}
 
+	#region var
+
 	static PlayerController _instance;
 
 	public static PlayerController Instance {
@@ -35,8 +38,9 @@ public class PlayerController : MonoBehaviour
 			return _instance;
 		}
 	}
-
+	[SerializeField] List<Player> playerList;
 	[SerializeField] Player player;
+
 	[SerializeField] Map map;
 	[SerializeField] COMMAND command = COMMAND.NONE;
 
@@ -48,16 +52,18 @@ public class PlayerController : MonoBehaviour
 			return player;
 		}
 	}
-
 	public COMMAND Command {
 		get {
 			return command;
 		}
 	}
+		
+	#endregion
 
 	void Awake ()
 	{
 		_instance = this;
+		playerList = new List<Player> ();
 	}
 
 	void Update ()
@@ -77,6 +83,10 @@ public class PlayerController : MonoBehaviour
 			break;
 		case COMMAND.MOVE:
 			{
+				#region showMoveRange
+
+				#endregion
+
 				//ray cast
 				Ray _ray = Camera.main.ScreenPointToRay (Input.mousePosition);
 				RaycastHit _hit = new RaycastHit ();
@@ -186,7 +196,6 @@ public class PlayerController : MonoBehaviour
 
 						if (_grid.owner != null) {
 							if (Input.GetMouseButtonDown (0)) {
-//								Debug.Log ("grid.owner:" + _grid.owner.name);
 
 								if (UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject ())
 									return;
@@ -239,7 +248,6 @@ public class PlayerController : MonoBehaviour
 						}
 
 						map.gridMat [_resultBuildVi.x, _resultBuildVi.y].SetGridColor (Color.green);
-
 
 
 					}
@@ -311,11 +319,59 @@ public class PlayerController : MonoBehaviour
 	{
 		map.ResetColor ();
 		ApplyCommand (COMMAND.DONE);
+
+		if (CommandController.Instance != null && CommandController.Instance.LastCommandUI != null) {
+			CommandController.Instance.LastCommandUI.CommandDone (player);
+		} else {
+			Debug.LogError ("CommandController Error");
+		}
 	}
 
-	//	public void MovePlayer(Stack<Grid> moveGridStack){
-	//		MovePlayer (player, moveGridStack);
-	//	}
+	public void PlayerBuildDone(){
+		map.ResetColor ();
+		ApplyCommand (COMMAND.DONE);
+
+		if (CommandController.Instance != null && CommandController.Instance.LastCommandUI != null) {
+			CommandController.Instance.LastCommandUI.CommandDone (player);
+		} else {
+			Debug.LogError ("CommandController Error");
+		}
+			
+	}
+
+	public void PlayerFightDone(){
+		map.ResetColor ();
+		ApplyCommand (COMMAND.DONE);
+
+		if (CommandController.Instance != null && CommandController.Instance.LastCommandUI != null) {
+			CommandController.Instance.LastCommandUI.CommandDone (player);
+		} else {
+			Debug.LogError ("CommandController Error");
+		}
+
+	}
+
+	public void Register(Player newPlayer){
+		if (playerList != null && !playerList.Contains(newPlayer)) {
+			playerList.Add (newPlayer);
+		}
+	}
+		
+	public void RoundNextPlayer(Player nowPlayer){
+		int _tempIndex = playerList.IndexOf(nowPlayer) + 1;
+
+		if (_tempIndex >= playerList.Count) {
+			_tempIndex = 0;
+		}
+
+		player = playerList [_tempIndex];
+		if (GUIController.Instance != null) {
+			GUIController.Instance.UpdateMainUI (player.playerData);
+		}
+		if (CommandController.Instance != null) {
+			CommandController.Instance.UpdateUI (player);
+		}
+	}
 
 	#endregion
 
@@ -345,11 +401,16 @@ public class PlayerController : MonoBehaviour
 			Debug.LogError ("no player");
 			return;
 		}
+		BuyBuildingEvent _buyBuildEvent = new BuyBuildingEvent ();
+		_buyBuildEvent.buyers = player;
+		_buyBuildEvent.setGrid = grid;
 
-//		GUIController.Instance.ShowGameEvent
+		GUIController.Instance.ShowBuyUI (_buyBuildEvent);
 	}
 
 	#endregion
+
+
 
 	[System.Obsolete ("this function is odd,use void MovePlayer(Stack<Grid> moveGridStack) instand of ")]
 	public void MovePlayer (int step)

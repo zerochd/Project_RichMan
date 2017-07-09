@@ -43,7 +43,6 @@ public class Player : Actor
 	public PlayerData playerData;
 
 	[SerializeField] Grid standGrid;
-	//	[SerializeField] Grid nextMoveGrid;
 
 	//move one gird speed;
 	[SerializeField] int moveSpeed = 4;
@@ -96,8 +95,6 @@ public class Player : Actor
 			if (moveGridStack.Count > 0) {
 		
 				_nextMoveGrid = moveGridStack.Peek ();
-				
-//				Debug.Log (Time.time + "nextMoveGrid:" + _nextMoveGrid.name);
 
 				if (MoveDone (_nextMoveGrid)) {
 
@@ -110,12 +107,12 @@ public class Player : Actor
 						standGrid.Arrived (this);
 				} else {
 
-
-//					Anim_Turn (_nextMoveGrid);
 					Anim_Move ();
 
-					if (_nextMoveGrid.owner == null)
+					if (_nextMoveGrid.owner == null) {
+						
 						MoveToGrid (_nextMoveGrid);
+					}
 				}
 
 			} else {
@@ -126,6 +123,7 @@ public class Player : Actor
 				if (PlayerController.Instance != null) {
 					PlayerController.Instance.PlayerMoveDone ();
 				}
+					
 				
 				Anim_Idle ();
 
@@ -134,63 +132,6 @@ public class Player : Actor
 			}
 		}
 
-
-
-
-//		if (moveStep > 0) {
-//			
-//			if (standGrid != null)
-//				nextMoveGrid = standGrid.NextGird;
-//
-//
-//			if (MoveDone ()) {
-//				
-//				if (isMoving == false) {
-//					Anim_Idle ();
-//					GetExp (nextMoveGrid.exp);
-//				}
-//
-//				isMoving = true;
-//
-//				standGrid = nextMoveGrid;
-//				moveStep--;
-//
-//				//excute 
-//				if (moveStep == 0 && standGrid != null) {
-//					standGrid.Arrived (this);
-//
-//					if (standGrid is MoveGrid) {
-//						//轮转至下一个玩家
-//						if (GameManager.Instance != null) {
-//							GameManager.Instance.RoundNextController ();
-//						}
-//					}
-//
-//				}
-//					
-//
-//			} else {
-//
-//				if (isMoving == true) {
-//
-//					Anim_Turn (nextMoveGrid);
-//
-//					Anim_Move ();
-//				}
-//
-//				isMoving = false;
-//
-//				if (nextMoveGrid.owner != null) {
-//					Fight (nextMoveGrid.owner);
-//				} else {
-//					MoveToGrid (nextMoveGrid);
-//				}
-//			}
-//				
-//		} else {
-//			
-//			Anim_Idle ();
-//		}
 	}
 
 	[ContextMenu ("Init")]
@@ -213,6 +154,10 @@ public class Player : Actor
 		if (GUIController.Instance != null) {
 			GUIController.Instance.UpdateMainUI (playerData);
 		}
+
+		if (PlayerController.Instance != null) {
+			PlayerController.Instance.Register (this);
+		}
 	}
 
 
@@ -229,6 +174,16 @@ public class Player : Actor
 		}
 	}
 
+	public void TurnToGrid(Grid nextGrid){
+		if (nextGrid == null || nextGrid.transform == null)
+			return;
+
+//		Vector3 _playerGridPosition = new Vector3 (this.actorTransform.position.x, nextGrid.transform.position.y, this.actorTransform.position.z);
+
+		this.actorTransform.LookAt (nextGrid.transform.position, Vector2.up);
+		
+	}
+
 	public void MoveToGrid (Grid nextGrid)
 	{
 		if (nextGrid == null)
@@ -237,6 +192,7 @@ public class Player : Actor
 		if (standGrid != null) {
 			standGrid.Free ();
 			standGrid = null;
+			TurnToGrid (nextGrid);
 		}
 
 		this.actorTransform.position = Vector3.MoveTowards (this.actorTransform.position, nextGrid.transform.position, moveSpeed * Time.deltaTime);
@@ -253,7 +209,6 @@ public class Player : Actor
 	{
 		this.moveGridStack = moveGridStack;
 
-//		Debug.Log ("called: " + this.moveGridStack.Count);
 		isMoving = true;
 	}
 
@@ -282,32 +237,15 @@ public class Player : Actor
 	AttackData attackData;
 	public void Fight (Actor other)
 	{
+		this.actorTransform.LookAt (other.ActorTransform.position, Vector3.up);
 		attackData = new AttackData (this, other, playerData.damage);
 		animator.SetInteger("AttackID",1);
 		animator.SetTrigger("once");
 
-//		if (other is Enemy) {
-//			
-//			Enemy _enemy = other as Enemy;
-//			AttackData _attackData = new AttackData (this, _enemy, playerData.damage);
-//			_enemy.UnderAttack (_attackData);
-//			if (GUIController.Instance != null) {
-//				GUIController.Instance.UpdateMainUI (playerData);	
-//			}
-//
-//			return true;
-//		} else if (other is Player) {
-//		
-//		}
-//
-//		return false;
-
-
 	}
 
 
-
-	public void UnderAttack (AttackData attackData)
+	public override void UnderAttack (AttackData attackData)
 	{
 		int _finalDamage = attackData.damage - playerData.defense;
 		if (_finalDamage < 0)
@@ -319,7 +257,7 @@ public class Player : Actor
 		}
 			
 	}
-
+		
 	public void Dead ()
 	{
 		
@@ -398,16 +336,26 @@ public class Player : Actor
 		if (attackData.attackTarget is Enemy) {
 						
 			Debug.Log("is enemy");
-			Enemy _enemy = attackData.attackTarget  as Enemy;
+			Enemy _enemy = attackData.attackTarget as Enemy;
 			AttackData _attackData = new AttackData (this, _enemy, playerData.damage);
 			_enemy.UnderAttack (_attackData);
 			if (GUIController.Instance != null) {
 				GUIController.Instance.UpdateMainUI (playerData);	
 			}
 
-		} else if (attackData.attackTarget  is Player) {
+		} else if (attackData.attackTarget is Player) {
 		
+		}else if(attackData.attackTarget is Building){
+			Debug.Log ("is building");
+			Building _building = attackData.attackTarget as Building;
+			AttackData _attackData = new AttackData (this, _building, playerData.damage);
 		}
+
+		if (PlayerController.Instance != null) {
+			PlayerController.Instance.PlayerFightDone ();
+		}
+
+
 	}
 
 	#endregion

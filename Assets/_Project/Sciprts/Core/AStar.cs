@@ -30,7 +30,7 @@ public class AStar
 			_currentGrid = openList [0];
 
 			if (_currentGrid == endGird) {
-				Debug.Log ("find endGrid");
+//				Debug.Log ("find endGrid");
 
 				//生成结果
 				GenerateResult (_currentGrid);

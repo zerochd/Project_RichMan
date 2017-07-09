@@ -9,6 +9,8 @@ public class AttackUI : MonoBehaviour,ICommandUI {
 	[SerializeField] Button eventButton;
 	[SerializeField] Text eventText;
 
+	int useTime = 1;
+
 	void Awake(){
 		Init ();
 	}
@@ -24,6 +26,26 @@ public class AttackUI : MonoBehaviour,ICommandUI {
 	}
 
 	#region ICommandUI implementation
+
+	public void InitUI (Player controllerPlayer)
+	{
+		if (controllerPlayer == null) {
+
+		} else {
+			useTime = 1;
+		}
+
+		EnableCommand ();
+	}
+
+	public int UseTime {
+		get {
+			return useTime;
+		}
+		set {
+			useTime = value;
+		}
+	}
 
 	public bool CanExcute ()
 	{
@@ -51,8 +73,21 @@ public class AttackUI : MonoBehaviour,ICommandUI {
 	}
 
 	public void EnableCommand(){
+		if (useTime <= 0)
+			return;
+
 		if(this.eventButton)
 			this.eventButton.interactable = true;
+	}
+
+	public void CommandDone(Player controllerPlayer){
+
+		useTime--;
+
+		if (PlayerController.Instance != null) {
+			PlayerController.Instance.RoundNextPlayer (controllerPlayer);
+		}
+
 	}
 
 	#endregion

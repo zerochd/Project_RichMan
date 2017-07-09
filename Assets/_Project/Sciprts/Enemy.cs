@@ -39,7 +39,7 @@ public class Enemy : Actor {
 		SetupBornGrid ();
 	}
 		
-	public virtual void UnderAttack(AttackData attackData){
+	public override void UnderAttack(AttackData attackData){
 
 		int _finalDamage = attackData.damage - enemyData.defense;
 		if (_finalDamage < 0)

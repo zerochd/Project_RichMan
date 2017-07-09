@@ -17,6 +17,7 @@ public class GUIController : MonoBehaviour {
 	}
 
 	[SerializeField] EventUI eventUI;
+	[SerializeField] BuyUI buyUI;
 	[SerializeField] GoUI goUI;
 
 	[SerializeField] IMainUI[] iMainUIArray;
@@ -29,8 +30,14 @@ public class GUIController : MonoBehaviour {
 	public void ShowGameEvent(GameEvent gameEvent){
 		if (eventUI == null)
 			return;
-//		eventUI.Show (gameEvent.eventDescription);
 		eventUI.Show (gameEvent);
+	}
+		
+
+	public void ShowBuyUI(BuyEvent buyEvent){
+		if(buyUI == null)
+			return;
+		buyUI.Show (buyEvent);
 	}
 
 	[ContextMenu("Init")]
@@ -39,7 +46,9 @@ public class GUIController : MonoBehaviour {
 			eventUI = GetComponentInChildren<EventUI> ();
 		if(goUI == null)
 			goUI = GetComponentInChildren<GoUI> ();
-
+		if (buyUI == null)
+			buyUI = GetComponentInChildren<BuyUI> ();
+		
 		iMainUIArray = GetComponentsInChildren<IMainUI> ();
 
 //		Debug.Log ("ima:" + iMainUIArray.Length);

@@ -25,6 +25,25 @@ public class CancelUI : MonoBehaviour,ICommandUI {
 
 	#region ICommandUI implementation
 
+	public void InitUI (Player controllerPlayer)
+	{
+//		if (controllerPlayer == null) {
+//
+//		} else {
+//			useTime = 1;
+//		}
+
+	}
+
+	public int UseTime {
+		get {
+			return 10000;
+		}
+		set {
+			
+		}
+	}
+
 	public bool CanExcute ()
 	{
 		if (PlayerController.Instance.Command != PlayerController.COMMAND.NONE)
@@ -37,9 +56,6 @@ public class CancelUI : MonoBehaviour,ICommandUI {
 		if (PlayerController.Instance == null)
 			return;
 
-//		if (!CanExcute())
-//			return;
-
 		if (CommandController.Instance != null) {
 			CommandController.Instance.Use (this);
 		}
@@ -50,6 +66,10 @@ public class CancelUI : MonoBehaviour,ICommandUI {
 	public void EnableCommand(){
 		if(this.eventButton)
 			this.eventButton.interactable = true;
+	}
+
+	public void CommandDone(Player controllerPlayer){
+
 	}
 
 	#endregion

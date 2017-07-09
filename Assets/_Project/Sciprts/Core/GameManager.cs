@@ -15,17 +15,8 @@ public class GameManager : MonoBehaviour {
 		}
 	}
 
-	public bool GameStart;
+	[SerializeField] bool GameStart;
 
-	[SerializeField] PlayerController[] playerControllerArray;
-
-	Queue<PlayerController> m_playerControllerQueue;
-
-	public Queue<PlayerController> PlayerControllerQueue {
-		get {
-			return m_playerControllerQueue;
-		}
-	}
 
 	[SerializeField] PlayerController m_nowControler;
 
@@ -37,39 +28,12 @@ public class GameManager : MonoBehaviour {
 
 	void Awake(){
 		_instance = this;
-		SetupQueue ();
 	}
-
-	void SetupQueue(){
-
-		if (m_playerControllerQueue == null) {
-			m_playerControllerQueue = new Queue<PlayerController> ();
-		} else {
-			m_playerControllerQueue.Clear ();
-		}
-			
-		foreach (var pc in playerControllerArray) {
-			m_playerControllerQueue.Enqueue (pc);
-		}
-
-		m_nowControler = m_playerControllerQueue.Dequeue ();
-
-	}
-
-
 	// Use this for initialization
 	void Start () {
 		GameStart = true;
 	}
-
-	public void RoundNextController(){
-		m_playerControllerQueue.Enqueue (m_nowControler);
-		m_nowControler = m_playerControllerQueue.Dequeue ();
-		if (GUIController.Instance != null) {
-			GUIController.Instance.UpdateGo (m_nowControler);
-		}
-
-	}
+		
 	
 //	// Update is called once per frame
 //	void Update () {

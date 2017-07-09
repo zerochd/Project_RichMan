@@ -15,10 +15,11 @@ public class EventUI : MonoBehaviour {
 	}
 
 	void Start(){
-		eventButton.onClick.AddListener (delegate {
-			EventExcute();
-		});
-
+		if (eventButton != null) {
+			eventButton.onClick.AddListener (delegate {
+				EventExcute ();
+			});
+		}
 	}
 
 	public void Show(string text){
@@ -37,6 +38,7 @@ public class EventUI : MonoBehaviour {
 
 		Time.timeScale = 0f;
 	}
+		
 
 	public void Hide(){
 		gameObject.SetActive (false);
@@ -62,11 +64,6 @@ public class EventUI : MonoBehaviour {
 		}
 
 		Hide ();
-
-		//轮转至下一个玩家
-		if (GameManager.Instance != null) {
-			GameManager.Instance.RoundNextController ();
-		}
 
 		Time.timeScale = 1f;
 	}

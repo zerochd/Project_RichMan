@@ -15,7 +15,7 @@ public class CommandController : MonoBehaviour {
 		}
 	}
 
-	[SerializeField] PlayerController playerController;
+//	[SerializeField] PlayerController playerController;
 	[SerializeField] ICommandUI[] iCommandUIArray;
 
 	ICommandUI lastCommandUI;
@@ -50,5 +50,13 @@ public class CommandController : MonoBehaviour {
 		}
 
 		lastCommandUI = commadUI;
+	}
+
+	public void UpdateUI(Player controlPlayer){
+		
+		foreach (var commandUI in iCommandUIArray) {
+			commandUI.InitUI (controlPlayer);
+		}
+		
 	}
 }
