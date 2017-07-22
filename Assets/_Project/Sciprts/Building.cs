@@ -4,16 +4,14 @@ using UnityEngine;
 
 public class Building : Actor {
 
-	Animator animator;
 
 	[SerializeField] Actor owner;
 	[SerializeField] Grid locateGrid;
 
-	public void Init(Actor owner,Grid grid){
+	public void InitBuilding(Actor owner,Grid grid){
+		base.Init ();
 		this.owner = owner;
 		this.locateGrid = grid;
-		animator = GetComponent<Animator> ();
-		actorTransform = animator.transform;
 		grid.Arrived (this);
 
 		actorTransform.position = grid.transform.position;

@@ -17,7 +17,7 @@ public class BuildingItemUI : MonoBehaviour {
 			_go.transform.SetParent (bornParent);
 			Building _building = _go.GetComponent<Building> ();
 			buildEvent.item = _building;
-			_building.Init (buildEvent.buyers, buildEvent.setGrid);
+			_building.InitBuilding (buildEvent.buyers, buildEvent.setGrid);
 		}
 	}
 }

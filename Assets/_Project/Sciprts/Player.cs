@@ -38,26 +38,17 @@ public class PlayerData
 
 }
 
-public class Player : Actor
+public sealed class Player : Actor
 {
 	public PlayerData playerData;
-
-	[SerializeField] Grid standGrid;
 
 	//move one gird speed;
 	[SerializeField] int moveSpeed = 4;
 	[SerializeField] int moveStep;
 	[SerializeField] bool isMoving = false;
 
-	Animator animator;
 	MeshRenderer meshRenderer;
 	Stack<Grid> moveGridStack = new Stack<Grid> ();
-
-	public Grid StandGrid {
-		get {
-			return standGrid;
-		}
-	}
 
 	public int MoveStep {
 		get {
@@ -134,13 +125,9 @@ public class Player : Actor
 	}
 
 	[ContextMenu ("Init")]
-	void Init ()
+	protected override void Init ()
 	{
-		animator = GetComponentInChildren<Animator> ();
-
-		if (animator != null) {
-			actorTransform = animator.transform;
-		}
+		base.Init ();
 
 		if (meshRenderer == null) {
 			meshRenderer = GetComponentInChildren<MeshRenderer> ();
@@ -162,21 +149,7 @@ public class Player : Actor
 			PlayerController.Instance.Register (this);
 		}
 
-		ActiveActor (true);
-	}
-
-
-	void SetupBornGrid ()
-	{
-		if (actorTransform == null)
-			return;
-
-		RaycastHit _hit;
-		if (Physics.Raycast (actorTransform.position + actorTransform.up * 5f, actorTransform.up * (-1f), out _hit, 100f, 1 << LayerMask.NameToLayer ("Grid"))) {
-			Grid _mg = _hit.collider.GetComponentInParent<Grid> ();
-			standGrid = _mg;
-			standGrid.Arrived (this);
-		}
+//		ActiveActor (true);
 	}
 
 	public void TurnToGrid(Grid nextGrid){
@@ -280,22 +253,15 @@ public class Player : Actor
 		}
 	}
 
-	public void ActiveActor(bool val){
+	public override void ActiveActor(bool val){
 		if (val) {
-		
-//			if (meshRenderer != null) {
-//				meshRenderer.material.color = Color.white;
-//			}
+
 
 		} else {
-		
-//			if (meshRenderer != null) {
-//				meshRenderer.material.color = Color.black;
-//			}
-		}
 
-		if (animator != null)
-			animator.enabled = val;
+		}
+			
+		base.ActiveActor (val);
 	}
 
 	#region anim_FUNCTION

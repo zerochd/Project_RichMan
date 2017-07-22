@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerController : MonoBehaviour
+public class PlayerController : ActorController
 {
 	public enum COMMAND
 	{
@@ -38,17 +38,14 @@ public class PlayerController : MonoBehaviour
 			return _instance;
 		}
 	}
-
-	[SerializeField] int playerNum;
-
-	[SerializeField] List<Player> playerList;
+		
 	[SerializeField] Player player;
-
 	[SerializeField] Map map;
 	[SerializeField] COMMAND command = COMMAND.NONE;
 
 	Grid hoverGrid;
 	Stack<Grid> getGrids = new Stack<Grid> ();
+	int playerDoneNum;
 
 	public Player PlayerEntity {
 		get {
@@ -66,12 +63,16 @@ public class PlayerController : MonoBehaviour
 	void Awake ()
 	{
 		_instance = this;
-		playerList = new List<Player> ();
+		base.Init ();
+		playerDoneNum = 0;
 	}
 
 	void Update ()
 	{
 		if (player == null)
+			return;
+
+		if (!enableControl)
 			return;
 
 		CommandUpdate ();
@@ -310,6 +311,12 @@ public class PlayerController : MonoBehaviour
 		}
 	}
 
+	#region Command FUNC
+
+
+	#endregion
+
+
 	#region public FUNC
 
 	public void ApplyCommand (COMMAND applyCommand)
@@ -371,31 +378,47 @@ public class PlayerController : MonoBehaviour
 		}
 
 	}
+		
 
-	public void Register(Player newPlayer){
-		if (playerList != null && !playerList.Contains(newPlayer)) {
-			playerList.Add (newPlayer);
-			if (playerList.Count == playerNum && MyCamera.Instance != null) {
-				MyCamera.Instance.LookAtTarget (newPlayer.ActorTransform.position, 15f);
-			}
-		}
+	public override void Register (Actor newActor)
+	{
+		base.Register (newActor);
 	}
+
+	public override void RoundFirstActor ()
+	{
+		base.RoundFirstActor ();
+		if (actorList.Count >= 1) {
+			player = actorList [0] as Player;
+			MyCamera.Instance.LookAtTarget (player.ActorTransform.position, 15f);
+			player.ActiveActor (true);
+			playerDoneNum = 0;
+		}
+		Debug.Log ("enter Player Round");
+	}
+
 
 	public void RoundEndPlayer(Player nowPlayer){
 
-		player.ActiveActor (false);
+		base.RoundEndActor (nowPlayer);
 
-		RoundNextPlayer (nowPlayer);
+		playerDoneNum++;
+
+		//如果所有人都结束了换下一波势力
+		if (playerDoneNum >= actorList.Count) {
+			playerDoneNum = 0;
+			if(GameManager.Instance != null){
+				GameManager.Instance.RoundEndActorController(this);
+			}
+		} else {
+			
+			RoundNextPlayer (nowPlayer);
+		}
 	}
 		
 	public void RoundNextPlayer(Player nowPlayer){
-		int _tempIndex = playerList.IndexOf(nowPlayer) + 1;
 
-		if (_tempIndex >= playerList.Count) {
-			_tempIndex = 0;
-		}
-
-		player = playerList [_tempIndex];
+		player = base.RoundNextActor(nowPlayer) as Player;
 
 		player.ActiveActor (true);
 

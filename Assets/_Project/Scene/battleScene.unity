@@ -751,13 +751,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   actorTransform: {fileID: 162176791}
+  animator: {fileID: 0}
+  standGrid: {fileID: 0}
   enemyName: T-REX
   enemyData:
     hp: 1
     damage: 1
     defense: 0
     exp: 5
-  standGrid: {fileID: 0}
   moveDone: 1
 --- !u!95 &162176793
 Animator:
@@ -1035,6 +1036,49 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 217052196}
+--- !u!1 &251505868
+GameObject:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  serializedVersion: 5
+  m_Component:
+  - component: {fileID: 251505869}
+  - component: {fileID: 251505870}
+  m_Layer: 0
+  m_Name: EnemyController
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &251505869
+Transform:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 251505868}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 17.914145, y: 0.7121582, z: 10.868137}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 9
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &251505870
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 251505868}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 11cf0ae09d0a7544db5dea7ae7889001, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enableControl: 0
+  actorList: []
+  enemy: {fileID: 0}
 --- !u!1 &274164658
 GameObject:
   m_ObjectHideFlags: 0
@@ -2508,7 +2552,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   GameStart: 0
-  m_nowControler: {fileID: 1970262091}
+  actorControllerList:
+  - {fileID: 1970262091}
+  - {fileID: 251505870}
+  nowActorController: {fileID: 0}
+  playerControler: {fileID: 0}
+  enemyController: {fileID: 0}
 --- !u!4 &619499734
 Transform:
   m_ObjectHideFlags: 0
@@ -9472,8 +9521,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e4a723178d5fe5e46baddf2199824a69, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerNum: 2
-  playerList: []
+  enableControl: 0
+  actorList: []
   player: {fileID: 1368846472}
   map: {fileID: 1875858116}
   command: -1

@@ -10,16 +10,12 @@ public struct EnemyData{
 	public int exp;
 }
 
-public class Enemy : Actor {
+public sealed class Enemy : Actor {
 
 	public string enemyName;
-
 	public EnemyData enemyData;
 
-	[SerializeField] Grid standGrid;
 	[SerializeField] bool moveDone = true;
-
-	Animator animator;
 
 	// Use this for initialization
 	void Start () {
@@ -27,16 +23,18 @@ public class Enemy : Actor {
 	}
 
 	[ContextMenu("Init")]
-	void Init(){
-		animator = GetComponentInChildren<Animator> ();
-
-		if (animator != null) {
-			actorTransform = animator.transform;
-		}
+	protected override void Init(){
+		
+		base.Init ();
 
 		moveDone = true;
 
 		SetupBornGrid ();
+
+		if (EnemyController.Instance != null) {
+			EnemyController.Instance.Register (this);
+		}
+
 	}
 		
 	public override void UnderAttack(AttackData attackData){
@@ -55,22 +53,16 @@ public class Enemy : Actor {
 		}
 	}
 
-	public virtual void Dead(){
-		Debug.Log ("dead");
+	public override void Dead ()
+	{
+		base.Dead ();
+		if (EnemyController.Instance != null) {
+			EnemyController.Instance.DeadActor (this);
+		}
 		standGrid.ResetValue ();
 		standGrid = null;
 		actorTransform.gameObject.SetActive (false);
 	}
 
-	void SetupBornGrid(){
-		if (actorTransform == null)
-			return;
-		RaycastHit _hit;
-		if (Physics.Raycast (actorTransform.position + actorTransform.up * 5f, actorTransform.up * (-1f), out _hit, 100f, 1 << LayerMask.NameToLayer ("Grid"))) {
-			
-			Grid _mg = _hit.collider.GetComponentInParent<Grid> ();
-			standGrid = _mg;
-			standGrid.Arrived (this);
-		} 
-	}
+
 }
