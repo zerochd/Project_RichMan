@@ -87,7 +87,7 @@ public class BuildUI : MonoBehaviour,ICommandUI {
 		useTime--;
 
 		if (PlayerController.Instance != null) {
-			PlayerController.Instance.RoundNextPlayer (controllerPlayer);
+			PlayerController.Instance.RoundEndPlayer (controllerPlayer);
 		}
 
 

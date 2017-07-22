@@ -17,7 +17,6 @@ public class GameManager : MonoBehaviour {
 
 	[SerializeField] bool GameStart;
 
-
 	[SerializeField] PlayerController m_nowControler;
 
 	public PlayerController NowControler {

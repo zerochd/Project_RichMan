@@ -50,7 +50,7 @@ public class Player : Actor
 	[SerializeField] bool isMoving = false;
 
 	Animator animator;
-
+	MeshRenderer meshRenderer;
 	Stack<Grid> moveGridStack = new Stack<Grid> ();
 
 	public Grid StandGrid {
@@ -123,7 +123,6 @@ public class Player : Actor
 				if (PlayerController.Instance != null) {
 					PlayerController.Instance.PlayerMoveDone ();
 				}
-					
 				
 				Anim_Idle ();
 
@@ -143,6 +142,10 @@ public class Player : Actor
 			actorTransform = animator.transform;
 		}
 
+		if (meshRenderer == null) {
+			meshRenderer = GetComponentInChildren<MeshRenderer> ();
+		}
+
 		isMoving = false;
 
 		SetupBornGrid ();
@@ -158,6 +161,8 @@ public class Player : Actor
 		if (PlayerController.Instance != null) {
 			PlayerController.Instance.Register (this);
 		}
+
+		ActiveActor (true);
 	}
 
 
@@ -178,8 +183,6 @@ public class Player : Actor
 		if (nextGrid == null || nextGrid.transform == null)
 			return;
 
-//		Vector3 _playerGridPosition = new Vector3 (this.actorTransform.position.x, nextGrid.transform.position.y, this.actorTransform.position.z);
-
 		this.actorTransform.LookAt (nextGrid.transform.position, Vector2.up);
 		
 	}
@@ -198,8 +201,7 @@ public class Player : Actor
 		this.actorTransform.position = Vector3.MoveTowards (this.actorTransform.position, nextGrid.transform.position, moveSpeed * Time.deltaTime);
 
 	}
-
-
+		
 	public void CalcMoveStep (int step)
 	{
 		moveStep = step;
@@ -242,8 +244,8 @@ public class Player : Actor
 		animator.SetInteger("AttackID",1);
 		animator.SetTrigger("once");
 
-	}
 
+	}
 
 	public override void UnderAttack (AttackData attackData)
 	{
@@ -276,6 +278,24 @@ public class Player : Actor
 			playerData.level++;
 			playerData.nextLevelExp = 500;
 		}
+	}
+
+	public void ActiveActor(bool val){
+		if (val) {
+		
+//			if (meshRenderer != null) {
+//				meshRenderer.material.color = Color.white;
+//			}
+
+		} else {
+		
+//			if (meshRenderer != null) {
+//				meshRenderer.material.color = Color.black;
+//			}
+		}
+
+		if (animator != null)
+			animator.enabled = val;
 	}
 
 	#region anim_FUNCTION
@@ -320,18 +340,11 @@ public class Player : Actor
 		animator.SetBool ("move", false);
 	}
 
-
 	//message-function
 	void AttackEnd(){
 
-//		Debug.Log("called");
-
 		if(attackData == null)
 			return;
-
-//		Debug.Log("attackTarget:"+attackData.attackTarget.name);
-//		Debug.Log("attackTarget is:"+attackData.attackTarget is Enemy);
-
 
 		if (attackData.attackTarget is Enemy) {
 						
@@ -354,6 +367,7 @@ public class Player : Actor
 		if (PlayerController.Instance != null) {
 			PlayerController.Instance.PlayerFightDone ();
 		}
+
 
 
 	}

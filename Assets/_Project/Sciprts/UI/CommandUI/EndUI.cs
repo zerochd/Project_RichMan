@@ -1,15 +1,13 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 using UnityEditor;
+using UnityEngine.UI;
 
-public class AttackUI : MonoBehaviour,ICommandUI {
+public class EndUI : MonoBehaviour,ICommandUI {
 
 	[SerializeField] Button eventButton;
 	[SerializeField] Text eventText;
-
-	int useTime = 1;
 
 	void Awake(){
 		Init ();
@@ -19,7 +17,7 @@ public class AttackUI : MonoBehaviour,ICommandUI {
 		if(eventButton != null)
 		{
 			eventButton.onClick.AddListener (delegate {
-//				Debug.Log("click");
+				
 				Excute();
 			});
 		}
@@ -29,28 +27,26 @@ public class AttackUI : MonoBehaviour,ICommandUI {
 
 	public void InitUI (Player controllerPlayer)
 	{
-		if (controllerPlayer == null) {
+//		if (controllerPlayer == null) {
+//
+//		} else {
+//			useTime = 1;
+//		}
 
-		} else {
-			useTime = 1;
-		}
-
-		EnableCommand ();
 	}
 
 	public int UseTime {
 		get {
-			return useTime;
+			return 10000;
 		}
 		set {
-			useTime = value;
+			
 		}
 	}
 
 	public bool CanExcute ()
 	{
-		if (PlayerController.Instance.Command != PlayerController.COMMAND.DONE 
-			&& PlayerController.Instance.Command != PlayerController.COMMAND.DOING)
+		if (PlayerController.Instance.Command != PlayerController.COMMAND.END)
 			return true;
 		return false;
 	}
@@ -60,34 +56,23 @@ public class AttackUI : MonoBehaviour,ICommandUI {
 		if (PlayerController.Instance == null)
 			return;
 
-		if (!CanExcute())
-			return;
-
 		if (CommandController.Instance != null) {
 			CommandController.Instance.Use (this);
 		}
 
-		PlayerController.Instance.ApplyCommand (PlayerController.COMMAND.ATTACK);
-		if(this.eventButton)
-			this.eventButton.interactable = false;
+		PlayerController.Instance.ApplyCommand (PlayerController.COMMAND.END);
+
 	}
 
 	public void EnableCommand(){
-		if (useTime <= 0)
-			return;
-
 		if(this.eventButton)
 			this.eventButton.interactable = true;
 	}
 
 	public void CommandDone(Player controllerPlayer){
-
-		useTime--;
-
 		if (PlayerController.Instance != null) {
 			PlayerController.Instance.RoundEndPlayer (controllerPlayer);
 		}
-
 	}
 
 	#endregion
@@ -101,7 +86,7 @@ public class AttackUI : MonoBehaviour,ICommandUI {
 		if (eventText == null) {
 			eventText = GetComponentInChildren<Text> ();
 		}
-			
+
 		#if UNITY_EDITOR
 		EditorUtility.SetDirty(this.gameObject);
 		#endif

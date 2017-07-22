@@ -4,8 +4,9 @@ using UnityEngine;
 
 public class MyCamera : MonoBehaviour
 {
-
 	const float minDistance = 10f;
+
+	private static MyCamera _instance;
 
 	public enum MOVE_TYPE
 	{
@@ -13,31 +14,41 @@ public class MyCamera : MonoBehaviour
 		FREE
 	}
 
-	public MOVE_TYPE moveType = MOVE_TYPE.LOCK_TARGET;
+	[SerializeField] MOVE_TYPE moveType = MOVE_TYPE.LOCK_TARGET;
+	[SerializeField] float distance = 20f;
+	[SerializeField] float speed = 240;
 
-	public float distance = 20f;
 
-	public float speed = 240;
+	[Header("DEBUG --- MyCamera")]
+	[SerializeField] Transform debugLookTarget;
+	[SerializeField] float debugLookSpeed;
+	[SerializeField] bool debugLook;
 
-	public bool enableControl = true;
-
-	void Start()
-	{
-		if (moveType == MOVE_TYPE.LOCK_TARGET) {
-			
+	public static MyCamera Instance {
+		get {
+			if (_instance == null) {
+				_instance = FindObjectOfType<MyCamera> ();
+			}
+			return _instance;
 		}
 	}
 
-	// Update is called once per frame
-//	void Update ()
+	public bool enableControl = true;
+
+	void Awake(){
+		_instance = this;
+	}
+
+//	void Start()
 //	{
-//
-//		enableControl = CheckCameraEnable ();
-//
-//		if (enableControl) {
-//			MoveCamera ();
+//		if (moveType == MOVE_TYPE.LOCK_TARGET) {
+//			
 //		}
 //	}
+
+	void Update(){
+		DebugUpdate ();
+	}
 
 	void LateUpdate(){
 		enableControl = CheckCameraEnable ();
@@ -47,17 +58,15 @@ public class MyCamera : MonoBehaviour
 		}
 	}
 
-	
+	void DebugUpdate(){
+		if (debugLook) {
+			LookAtTarget (debugLookTarget.position, debugLookSpeed);
+			debugLook = false;
+		}
+	}
+		
 	bool CheckCameraEnable ()
 	{
-//		if (GameManager.Instance == null) {
-//			return false;
-//		}
-//
-//		if (GameManager.Instance.NowControler == null) {
-//			return false;
-//		}
-
 		return true;
 	}
 
@@ -80,9 +89,6 @@ public class MyCamera : MonoBehaviour
 	void MoveCamera_LockTarget ()
 	{
 		Transform targetTransform = GameManager.Instance.NowControler.PlayerEntity.ActorTransform;
-
-//		this.transform.LookAt (targetTransform);
-
 
 		//-------ROTATION----------
 
@@ -183,4 +189,27 @@ public class MyCamera : MonoBehaviour
 		//--------------------------
 
 	}
+
+	public void LookAtTarget(Vector3 lookPosition,float speed){
+		StopAllCoroutines ();
+		StartCoroutine (Move_Cor (lookPosition,speed));
+	}
+
+	IEnumerator Move_Cor(Vector3 targetPosition,float speed){
+
+		float _height = this.transform.position.y;
+		float _delta = Mathf.Sqrt ((_height * _height) / 2);
+		float _x = targetPosition.x + _delta;
+		float _z = targetPosition.z - _delta;
+
+		Vector3 _targetVec = new Vector3 (_x, _height, _z);
+
+		while ((this.transform.position - targetPosition).sqrMagnitude > 0.1f) {
+			this.transform.position = Vector3.Lerp (this.transform.position, _targetVec, Time.smoothDeltaTime * speed);
+			yield return null;
+		}
+
+		yield return null;
+	}
+
 }

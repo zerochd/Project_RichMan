@@ -4,8 +4,6 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-	
-
 	public enum COMMAND
 	{
 		NONE = -1,
@@ -22,6 +20,8 @@ public class PlayerController : MonoBehaviour
 		//取消
 		DOING,
 		//执行中
+		END,
+		//直接结束
 		DONE
 		//结束
 	}
@@ -38,6 +38,9 @@ public class PlayerController : MonoBehaviour
 			return _instance;
 		}
 	}
+
+	[SerializeField] int playerNum;
+
 	[SerializeField] List<Player> playerList;
 	[SerializeField] Player player;
 
@@ -269,7 +272,6 @@ public class PlayerController : MonoBehaviour
 								if (UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject ())
 									return;
 
-//								command = COMMAND.DOING;
 								PlayerBuild (player, _grid);
 								return;
 							}
@@ -293,6 +295,11 @@ public class PlayerController : MonoBehaviour
 			{
 			}
 			break;
+		case COMMAND.END:
+			{
+				PlayerEnd ();
+			}
+			break;
 		case COMMAND.DONE:
 			{
 				command = COMMAND.NONE;
@@ -310,10 +317,20 @@ public class PlayerController : MonoBehaviour
 		if (map != null) {
 			map.ResetColor ();
 		}
-
 		this.command = applyCommand;
+
 	}
 
+	public void PlayerEnd(){
+		map.ResetColor ();
+		ApplyCommand (COMMAND.DONE);
+
+		if (CommandController.Instance != null && CommandController.Instance.LastCommandUI != null) {
+			CommandController.Instance.LastCommandUI.CommandDone (player);
+		} else {
+			Debug.LogError ("CommandController Error");
+		}
+	}
 
 	public void PlayerMoveDone ()
 	{
@@ -349,12 +366,26 @@ public class PlayerController : MonoBehaviour
 			Debug.LogError ("CommandController Error");
 		}
 
+		if (CommandController.Instance != null) {
+			CommandController.Instance.ShowUI ();
+		}
+
 	}
 
 	public void Register(Player newPlayer){
 		if (playerList != null && !playerList.Contains(newPlayer)) {
 			playerList.Add (newPlayer);
+			if (playerList.Count == playerNum && MyCamera.Instance != null) {
+				MyCamera.Instance.LookAtTarget (newPlayer.ActorTransform.position, 15f);
+			}
 		}
+	}
+
+	public void RoundEndPlayer(Player nowPlayer){
+
+		player.ActiveActor (false);
+
+		RoundNextPlayer (nowPlayer);
 	}
 		
 	public void RoundNextPlayer(Player nowPlayer){
@@ -365,6 +396,13 @@ public class PlayerController : MonoBehaviour
 		}
 
 		player = playerList [_tempIndex];
+
+		player.ActiveActor (true);
+
+		if (MyCamera.Instance != null) {
+			MyCamera.Instance.LookAtTarget (player.ActorTransform.position, 15f);
+		}
+
 		if (GUIController.Instance != null) {
 			GUIController.Instance.UpdateMainUI (player.playerData);
 		}
@@ -394,6 +432,10 @@ public class PlayerController : MonoBehaviour
 			return;
 		}
 		player.Fight (other);
+
+		if (CommandController.Instance != null) {
+			CommandController.Instance.HideUI ();
+		}
 	}
 
 	void PlayerBuild(Player player,Grid grid){
