@@ -171,6 +171,7 @@ MonoBehaviour:
   actorTransform: {fileID: 4064061293642252}
   animator: {fileID: 0}
   standGrid: {fileID: 0}
+  underControl: 0
   playerData:
     actorName: zero
     hp: 6

@@ -57,6 +57,14 @@ public class CommandController : MonoBehaviour {
 		foreach (var commandUI in iCommandUIArray) {
 			commandUI.InitUI (controlPlayer);
 		}
-		
+
+		ShowUI ();
+
 	}
+
+//	public void ResetUI(){
+//		foreach (var commandUI in iCommandUIArray) {
+//			commandUI.EnableCommand ();
+//		}
+//	}
 }

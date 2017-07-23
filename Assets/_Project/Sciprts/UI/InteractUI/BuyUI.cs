@@ -23,7 +23,7 @@ public class BuyUI : MonoBehaviour {
 	void Start(){
 		if (cancelButton != null) {
 			cancelButton.onClick.AddListener (delegate {
-				Hide();	
+				Cancel();	
 			});
 		}
 		if (yesButton != null) {
@@ -65,8 +65,6 @@ public class BuyUI : MonoBehaviour {
 		if (selectBuyGroup != null) {
 			foreach (var toggle in selectBuyGroup.GetComponentsInChildren<Toggle>()) {
 				if (toggle.isOn) {
-//					Debug.Log ("select toggle:" + toggle.name);
-
 					if (getBuyEvent is BuyBuildingEvent) {
 						BuildingItemUI _buildItemUI = toggle.GetComponent<BuildingItemUI> ();
 						BuyBuildingEvent _buildEvent = getBuyEvent as BuyBuildingEvent;
@@ -76,6 +74,15 @@ public class BuyUI : MonoBehaviour {
 				}
 			}
 		}
+	}
+
+	public void Cancel(){
+		if (CommandController.Instance != null && CommandController.Instance.LastCommandUI != null) {
+			CommandController.Instance.LastCommandUI.EnableCommand ();
+		}
+		PlayerController.Instance.ApplyCommand (COMMAND.NONE);
+		Hide ();
+
 	}
 
 	public void Hide(){

@@ -403,17 +403,18 @@ public class PlayerController : ActorController
 	}
 
 	public void PlayerFightDone(){
+		
 		map.ResetColor ();
 		ApplyCommand (COMMAND.DONE);
+
+		if (CommandController.Instance != null) {
+			CommandController.Instance.ShowUI ();
+		}
 
 		if (CommandController.Instance != null && CommandController.Instance.LastCommandUI != null) {
 			CommandController.Instance.LastCommandUI.CommandDone (player);
 		} else {
 			Debug.LogError ("CommandController Error");
-		}
-
-		if (CommandController.Instance != null) {
-			CommandController.Instance.ShowUI ();
 		}
 
 	}
@@ -434,6 +435,9 @@ public class PlayerController : ActorController
 		}
 		playerDoneNum = 0;
 		Debug.Log ("enter Player Round");
+		if (CommandController.Instance != null) {
+			CommandController.Instance.UpdateUI (player);
+		}
 	}
 
 
@@ -452,6 +456,9 @@ public class PlayerController : ActorController
 			playerDoneNum = 0;
 			if(GameManager.Instance != null){
 				GameManager.Instance.RoundEndActorController(this);
+			}
+			if (CommandController.Instance != null) {
+				CommandController.Instance.HideUI ();
 			}
 		} else {
 			

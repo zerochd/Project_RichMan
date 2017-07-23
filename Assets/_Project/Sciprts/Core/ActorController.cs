@@ -24,6 +24,7 @@ public class ActorController : MonoBehaviour {
 	public virtual void Register(Actor newActor){
 		if (actorList != null && !actorList.Contains (newActor)) {
 			actorList.Add (newActor);
+			newActor.ActiveActor (false);
 		}
 	}
 
