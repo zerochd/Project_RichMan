@@ -1,30 +1,32 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
+
+public enum COMMAND
+{
+	NONE = -1,
+	//无指令
+	MOVE = 0,
+	//移动
+	ATTACK,
+	//攻击
+	BUILD,
+	//建造
+	DEFENSE,
+	//防御
+	CANCEL,
+	//取消
+	DOING,
+	//执行中
+	END,
+	//直接结束
+	DONE
+	//结束
+}
 
 public class PlayerController : ActorController
 {
-	public enum COMMAND
-	{
-		NONE = -1,
-		//无指令
-		MOVE = 0,
-		//移动
-		ATTACK,
-		//攻击
-		BUILD,
-		//建造
-		DEFENSE,
-		//防御
-		CANCEL,
-		//取消
-		DOING,
-		//执行中
-		END,
-		//直接结束
-		DONE
-		//结束
-	}
 
 	#region var
 
@@ -42,9 +44,13 @@ public class PlayerController : ActorController
 	[SerializeField] Player player;
 	[SerializeField] Map map;
 	[SerializeField] COMMAND command = COMMAND.NONE;
+	[SerializeField] Transform gridSelect;
 
-	Grid hoverGrid;
-	Stack<Grid> getGrids = new Stack<Grid> ();
+	COMMAND prevCommand = COMMAND.NONE;
+
+//	Grid hoverGrid;
+	List<Grid> getActiveGirds = new List<Grid> ();
+	Stack<Grid> getMoveGrids = new Stack<Grid> ();
 	int playerDoneNum;
 
 	public Player PlayerEntity {
@@ -65,6 +71,9 @@ public class PlayerController : ActorController
 		_instance = this;
 		base.Init ();
 		playerDoneNum = 0;
+		if (gridSelect != null) {
+			gridSelect.gameObject.SetActive (false);
+		}
 	}
 
 	void Update ()
@@ -87,8 +96,32 @@ public class PlayerController : ActorController
 			break;
 		case COMMAND.MOVE:
 			{
-				#region showMoveRange
+				if (prevCommand != COMMAND.MOVE) {
+					getActiveGirds.Clear ();
+					if (gridSelect != null) {
+						gridSelect.gameObject.SetActive (false);
+					}
+				}
 
+				#region showMoveRange
+				VectorInt2 _playerVi = player.StandGrid.Vi;
+
+				VectorInt2[] _moveViArray = Util.GetViCricleByRadius(player.playerData.speed);
+
+				getActiveGirds.Clear();
+
+				foreach (var _moveVi in _moveViArray) { 
+					VectorInt2 _resultMoveVi = _playerVi + _moveVi;
+					if (_resultMoveVi < VectorInt2.Zero || _resultMoveVi > (map.Edge - VectorInt2.One)) {
+						continue;
+					}
+					if (map.gridMat [_resultMoveVi.x, _resultMoveVi.y] is BuildGrid) {
+						continue;
+					}
+					getActiveGirds.Add(map.gridMat[_resultMoveVi.x, _resultMoveVi.y]);
+					map.gridMat [_resultMoveVi.x, _resultMoveVi.y].SetGridColor (Color.blue);
+
+				}
 				#endregion
 
 				//ray cast
@@ -99,56 +132,52 @@ public class PlayerController : ActorController
 					Grid _grid = _hit.collider.GetComponentInParent<Grid> ();
 
 					if (_grid == null)
-						return;
+						break;
+
+					if (!getActiveGirds.Contains (_grid))
+						break;
+
+					if (gridSelect != null) {
+						gridSelect.gameObject.SetActive (true);
+						gridSelect.transform.position = _grid.transform.position;
+					}
 
 					if (_grid.owner == null) {
 
-						if (hoverGrid && hoverGrid != _grid) {
-							hoverGrid.ResetGridColor ();
-							if (map != null)
-								map.ResetColor ();
-
-							getGrids = AStar.CalcPath (player.StandGrid, _grid, map);
-
-							foreach (Grid _gd in getGrids.ToArray()) {
-								_gd.SetGridColor (Color.blue);
-							}
-
-						}
-
-						hoverGrid = _grid;	
-						hoverGrid.SetGridColor (Color.yellow);
+						getMoveGrids = AStar.CalcPath (player.StandGrid, _grid, map);
 
 						//press mouse button 0
 						if (Input.GetMouseButtonDown (0)) {
 
-							if (UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject ())
-								return;
+							if (EventSystem.current.IsPointerOverGameObject ())
+								break;
+
+							if (gridSelect != null) {
+								gridSelect.gameObject.SetActive (false);
+							}
 
 							command = COMMAND.DOING;
-
-							hoverGrid.SetGridColor (Color.red);
-
 							//move player
-							MovePlayer (player, getGrids);
+							MovePlayer (player, getMoveGrids);
 
-							return;
+
+							break;
 						}
 
-					} else {
-						if (hoverGrid) {
-							hoverGrid.ResetGridColor ();
-						}
-					}
-				} else {
-					if (hoverGrid) {
-						hoverGrid.ResetGridColor ();
 					}
 				}
 			}
 			break;
 		case COMMAND.ATTACK:
 			{
+
+				if (prevCommand != COMMAND.ATTACK) {
+					getActiveGirds.Clear ();
+					if (gridSelect != null) {
+						gridSelect.gameObject.SetActive (false);
+					}
+				}
+
 				if (map != null && player.StandGrid != null) {
 
 					#region show AttackRange
@@ -156,22 +185,9 @@ public class PlayerController : ActorController
 					//获得玩家所在grid的坐标
 					VectorInt2 _playerVi = player.StandGrid.Vi;
 
-					//获得攻击范围数据(fake temp)
-					VectorInt2[] _attackViArray = new VectorInt2[4];
-					int _index = 0;
-					for (int i = -1; i <= 1; i++) {
-						for (int j = -1; j <= 1; j++) {
+					VectorInt2[] _attackViArray = Util.GetViCricleByRadius(1);
 
-							if (i == j || i == -j)
-								continue;
-
-							_attackViArray [_index] = new VectorInt2 (i, j);
-							_index++;
-
-							if (_index >= _attackViArray.Length)
-								break;
-						}
-					}
+					getActiveGirds.Clear();
 
 					foreach (var _attackVi in _attackViArray) { 
 						VectorInt2 _resultAttackVi = _playerVi + _attackVi;
@@ -181,7 +197,7 @@ public class PlayerController : ActorController
 						if (map.gridMat [_resultAttackVi.x, _resultAttackVi.y] is BuildGrid) {
 							continue;
 						}
-
+						getActiveGirds.Add(map.gridMat[_resultAttackVi.x, _resultAttackVi.y]);
 						map.gridMat [_resultAttackVi.x, _resultAttackVi.y].SetGridColor (Color.magenta);
 
 					}
@@ -196,17 +212,28 @@ public class PlayerController : ActorController
 						Grid _grid = _hit.collider.GetComponentInParent<Grid> ();
 
 						if (_grid == null)
-							return;
+							break;
+
+						if (!getActiveGirds.Contains (_grid))
+							break;
+
+						if (gridSelect != null) {
+							gridSelect.gameObject.SetActive (true);
+							gridSelect.transform.position = _grid.transform.position;
+						}
 
 						if (_grid.owner != null) {
+
 							if (Input.GetMouseButtonDown (0)) {
 
-								if (UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject ())
-									return;
-
+								if (EventSystem.current.IsPointerOverGameObject ())
+									break;
+								if (gridSelect != null) {
+									gridSelect.gameObject.SetActive (false);
+								}
 								command = COMMAND.DOING;
 								PlayerFight (player, _grid.owner);
-								return;
+								break;
 							}
 
 						}
@@ -218,6 +245,13 @@ public class PlayerController : ActorController
 			break;
 		case COMMAND.BUILD:
 			{
+				if (prevCommand != COMMAND.BUILD) {
+					getActiveGirds.Clear ();
+					if (gridSelect != null) {
+						gridSelect.gameObject.SetActive (false);
+					}
+				}
+
 				if (map != null && player.StandGrid != null) {
 
 					#region show build range
@@ -225,22 +259,9 @@ public class PlayerController : ActorController
 					//获得玩家所在grid的坐标
 					VectorInt2 _playerVi = player.StandGrid.Vi;
 
-					//获得建造范围数据(fake temp)
-					VectorInt2[] _buildViArray = new VectorInt2[4];
-					int _index = 0;
-					for (int i = -1; i <= 1; i++) {
-						for (int j = -1; j <= 1; j++) {
+					VectorInt2[] _buildViArray = Util.GetViCricleByRadius(1);
 
-							if (i == j || i == -j)
-								continue;
-
-							_buildViArray [_index] = new VectorInt2 (i, j);
-							_index++;
-
-							if (_index >= _buildViArray.Length)
-								break;
-						}
-					}
+					getActiveGirds.Clear ();
 
 					foreach (var _buildVi in _buildViArray) { 
 						VectorInt2 _resultBuildVi = _playerVi + _buildVi;
@@ -251,8 +272,9 @@ public class PlayerController : ActorController
 							continue;
 						}
 
-						map.gridMat [_resultBuildVi.x, _resultBuildVi.y].SetGridColor (Color.green);
+						getActiveGirds.Add(map.gridMat[_resultBuildVi.x, _resultBuildVi.y]);
 
+						map.gridMat [_resultBuildVi.x, _resultBuildVi.y].SetGridColor (Color.green);
 
 					}
 
@@ -265,16 +287,31 @@ public class PlayerController : ActorController
 						Grid _grid = _hit.collider.GetComponentInParent<Grid> ();
 
 						if (_grid == null)
-							return;
+							break;;
+
+						if (!getActiveGirds.Contains (_grid))
+							break;
+
+						if (gridSelect != null) {
+							gridSelect.gameObject.SetActive (true);
+							gridSelect.transform.position = _grid.transform.position;
+						}
 
 						if (_grid.owner == null) {
+
 							if (Input.GetMouseButtonDown (0)) {
 
 								if (UnityEngine.EventSystems.EventSystem.current.IsPointerOverGameObject ())
-									return;
+									break;
+								
+								if (gridSelect != null) {
+									gridSelect.gameObject.SetActive (false);
+								}
 
+								command = COMMAND.DOING;
 								PlayerBuild (player, _grid);
-								return;
+
+								break;
 							}
 
 						}
@@ -309,6 +346,8 @@ public class PlayerController : ActorController
 		default:
 			throw new System.ArgumentOutOfRangeException ();
 		}
+
+		prevCommand = command;
 	}
 
 	#region Command FUNC
@@ -392,8 +431,8 @@ public class PlayerController : ActorController
 			player = actorList [0] as Player;
 			MyCamera.Instance.LookAtTarget (player.ActorTransform.position, 15f);
 			player.ActiveActor (true);
-			playerDoneNum = 0;
 		}
+		playerDoneNum = 0;
 		Debug.Log ("enter Player Round");
 	}
 
@@ -403,6 +442,10 @@ public class PlayerController : ActorController
 		base.RoundEndActor (nowPlayer);
 
 		playerDoneNum++;
+
+		if (gridSelect != null) {
+			gridSelect.gameObject.SetActive (false);
+		}
 
 		//如果所有人都结束了换下一波势力
 		if (playerDoneNum >= actorList.Count) {

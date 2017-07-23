@@ -48,8 +48,8 @@ public class MoveUI : MonoBehaviour,ICommandUI {
 
 	public bool CanExcute ()
 	{
-		if (PlayerController.Instance.Command != PlayerController.COMMAND.DONE 
-			&& PlayerController.Instance.Command != PlayerController.COMMAND.DOING)
+		if (PlayerController.Instance.Command != COMMAND.DONE 
+			&& PlayerController.Instance.Command != COMMAND.DOING)
 			return true;
 		return false;
 	}
@@ -66,7 +66,7 @@ public class MoveUI : MonoBehaviour,ICommandUI {
 			CommandController.Instance.Use (this);
 		}
 
-		PlayerController.Instance.ApplyCommand (PlayerController.COMMAND.MOVE);
+		PlayerController.Instance.ApplyCommand (COMMAND.MOVE);
 		if(this.eventButton)
 			this.eventButton.interactable = false;
 

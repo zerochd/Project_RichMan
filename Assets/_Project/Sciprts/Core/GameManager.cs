@@ -40,7 +40,14 @@ public class GameManager : MonoBehaviour {
 //		actorControllerList.Clear ();
 	}
 	// Use this for initialization
-	void Start () {
+//	void Start () {
+//		Init ();
+//	}
+
+	IEnumerator Start(){
+
+		yield return new WaitForSeconds (2f);
+
 		Init ();
 	}
 

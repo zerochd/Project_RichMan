@@ -21,7 +21,7 @@ GameObject:
   - component: {fileID: 4781513036892308}
   - component: {fileID: 33775397914414076}
   - component: {fileID: 23676290910229380}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: default
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -38,9 +38,9 @@ GameObject:
   - component: {fileID: 4064061293642252}
   - component: {fileID: 114117286749298882}
   - component: {fileID: 95369601636464556}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: Player1
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -53,7 +53,7 @@ GameObject:
   serializedVersion: 5
   m_Component:
   - component: {fileID: 4853221510429918}
-  m_Layer: 0
+  m_Layer: 10
   m_Name: chr_sword
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -67,7 +67,7 @@ Transform:
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1370780476134106}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 16, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4853221510429918}
@@ -150,7 +150,7 @@ Animator:
   m_Enabled: 1
   m_Avatar: {fileID: 0}
   m_Controller: {fileID: 9100000, guid: 44a4e21c3a5676d47b190fb9c708ca49, type: 2}
-  m_CullingMode: 0
+  m_CullingMode: 1
   m_UpdateMode: 0
   m_ApplyRootMotion: 1
   m_LinearVelocityBlending: 0
@@ -169,18 +169,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   actorTransform: {fileID: 4064061293642252}
+  animator: {fileID: 0}
+  standGrid: {fileID: 0}
   playerData:
-    palyerName: Zero
-    hp: 5
-    maxHp: 5
-    damage: 1
+    actorName: zero
+    hp: 6
+    maxHp: 6
+    damage: 4
     defense: 0
     speed: 3
     money: 0
     level: 1
     exp: 0
     nextLevelExp: 3
-  standGrid: {fileID: 0}
   moveSpeed: 20
   moveStep: 0
   isMoving: 0

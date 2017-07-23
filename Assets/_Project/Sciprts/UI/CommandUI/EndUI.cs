@@ -46,7 +46,7 @@ public class EndUI : MonoBehaviour,ICommandUI {
 
 	public bool CanExcute ()
 	{
-		if (PlayerController.Instance.Command != PlayerController.COMMAND.END)
+		if (PlayerController.Instance.Command != COMMAND.END)
 			return true;
 		return false;
 	}
@@ -60,7 +60,7 @@ public class EndUI : MonoBehaviour,ICommandUI {
 			CommandController.Instance.Use (this);
 		}
 
-		PlayerController.Instance.ApplyCommand (PlayerController.COMMAND.END);
+		PlayerController.Instance.ApplyCommand (COMMAND.END);
 
 	}
 

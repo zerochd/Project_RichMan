@@ -46,7 +46,7 @@ public class CancelUI : MonoBehaviour,ICommandUI {
 
 	public bool CanExcute ()
 	{
-		if (PlayerController.Instance.Command != PlayerController.COMMAND.NONE)
+		if (PlayerController.Instance.Command != COMMAND.NONE)
 			return true;
 		return false;
 	}
@@ -60,7 +60,7 @@ public class CancelUI : MonoBehaviour,ICommandUI {
 			CommandController.Instance.Use (this);
 		}
 
-		PlayerController.Instance.ApplyCommand (PlayerController.COMMAND.NONE);
+		PlayerController.Instance.ApplyCommand (COMMAND.NONE);
 	}
 
 	public void EnableCommand(){

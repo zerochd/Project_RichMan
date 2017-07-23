@@ -49,8 +49,8 @@ public class AttackUI : MonoBehaviour,ICommandUI {
 
 	public bool CanExcute ()
 	{
-		if (PlayerController.Instance.Command != PlayerController.COMMAND.DONE 
-			&& PlayerController.Instance.Command != PlayerController.COMMAND.DOING)
+		if (PlayerController.Instance.Command != COMMAND.DONE 
+			&& PlayerController.Instance.Command != COMMAND.DOING)
 			return true;
 		return false;
 	}
@@ -67,7 +67,7 @@ public class AttackUI : MonoBehaviour,ICommandUI {
 			CommandController.Instance.Use (this);
 		}
 
-		PlayerController.Instance.ApplyCommand (PlayerController.COMMAND.ATTACK);
+		PlayerController.Instance.ApplyCommand (COMMAND.ATTACK);
 		if(this.eventButton)
 			this.eventButton.interactable = false;
 	}

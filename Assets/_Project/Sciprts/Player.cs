@@ -21,17 +21,9 @@ public class AttackData
 }
 
 [System.Serializable]
-public class PlayerData
+public class PlayerData : ActorData
 {
-	public string palyerName;
-	public int hp = 5;
-	public int maxHp = 5;
-	public int damage = 1;
-	public int defense = 0;
-	public int speed = 6;
 	public int money = 0;
-
-
 	public int level = 1;
 	public int exp = 0;
 	public int nextLevelExp = 5;
@@ -69,6 +61,9 @@ public sealed class Player : Actor
 
 	void Update ()
 	{
+		if (!underControl)
+			return;
+
 		MoveUpdate ();
 	}
 
@@ -255,8 +250,9 @@ public sealed class Player : Actor
 
 	public override void ActiveActor(bool val){
 		if (val) {
-
-
+			if (GUIController.Instance != null) {
+				GUIController.Instance.UpdateMainUI (playerData);
+			}
 		} else {
 
 		}
