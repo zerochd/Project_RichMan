@@ -67,14 +67,58 @@ public class Grid : MonoBehaviour,IComparable<Grid> {
 
 
 	[SerializeField] VectorInt2 vi;
+	[SerializeField] GirdEvent gridEvent; 
 
-	public int f;
-	public int g;
-	public int h;
+	int f;
+	int g;
+	int h;
 
-	public Grid gridParent;
-	public Actor owner;
+	Grid gridParent;
+	Actor owner;
 	public Color lastColor = Color.white;
+
+	public int F {
+		get {
+			return f;
+		}
+		set {
+			f = value;
+		}
+	}
+
+	public int G {
+		get {
+			return g;
+		}
+		set {
+			g = value;
+		}
+	}
+
+	public int H {
+		get {
+			return h;
+		}
+		set {
+			h = value;
+		}
+	}
+
+	public Grid GridParent {
+		get {
+			return gridParent;
+		}
+		set {
+			gridParent = value;
+		}
+	}
+
+	public Actor Owner {
+		get {
+			return owner;
+		}
+	}
+		
 
 	public VectorInt2 Vi {
 		get {
@@ -113,6 +157,10 @@ public class Grid : MonoBehaviour,IComparable<Grid> {
 			owner = actor;
 
 			GetComponentInChildren<MeshRenderer> ().material.color = Color.red;
+
+			if (gridEvent != null) {
+				gridEvent.ExcuteEvent (actor);
+			}
 
 			return true;
 		}

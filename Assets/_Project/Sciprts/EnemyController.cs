@@ -68,7 +68,7 @@ public class EnemyController : ActorController {
 				if (map.gridMat [_resultMoveVi.x, _resultMoveVi.y] is BuildGrid) {
 					continue;
 				}
-				if (map.gridMat [_resultMoveVi.x, _resultMoveVi.y].owner != null) {
+				if (map.gridMat [_resultMoveVi.x, _resultMoveVi.y].Owner != null) {
 					continue;
 				}
 

@@ -142,7 +142,7 @@ public class PlayerController : ActorController
 						gridSelect.transform.position = _grid.transform.position;
 					}
 
-					if (_grid.owner == null) {
+					if (_grid.Owner == null) {
 
 						getMoveGrids = AStar.CalcPath (player.StandGrid, _grid, map);
 
@@ -222,7 +222,7 @@ public class PlayerController : ActorController
 							gridSelect.transform.position = _grid.transform.position;
 						}
 
-						if (_grid.owner != null) {
+						if (_grid.Owner != null) {
 
 							if (Input.GetMouseButtonDown (0)) {
 
@@ -232,7 +232,7 @@ public class PlayerController : ActorController
 									gridSelect.gameObject.SetActive (false);
 								}
 								command = COMMAND.DOING;
-								PlayerFight (player, _grid.owner);
+								PlayerFight (player, _grid.Owner);
 								break;
 							}
 
@@ -297,7 +297,7 @@ public class PlayerController : ActorController
 							gridSelect.transform.position = _grid.transform.position;
 						}
 
-						if (_grid.owner == null) {
+						if (_grid.Owner == null) {
 
 							if (Input.GetMouseButtonDown (0)) {
 

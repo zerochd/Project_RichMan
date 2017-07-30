@@ -2818,6 +2818,12 @@ Prefab:
       propertyPath: m_Name
       value: 16gird20
       objectReference: {fileID: 0}
+    - target: {fileID: 114511062462650542, guid: 50dd1fdc89149a143ab0422b72898976,
+        type: 2}
+      propertyPath: gridEvent
+      value: 
+      objectReference: {fileID: 11400000, guid: 03fc652fa6f4b1f418bdd43d83435097,
+        type: 2}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 50dd1fdc89149a143ab0422b72898976, type: 2}
   m_IsPrefabParent: 0
@@ -3908,7 +3914,7 @@ GameObject:
   - component: {fileID: 802191513}
   - component: {fileID: 802191512}
   - component: {fileID: 802191517}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: Main Camera
   m_TagString: MainCamera
   m_Icon: {fileID: 0}

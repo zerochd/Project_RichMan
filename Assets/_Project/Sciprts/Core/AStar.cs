@@ -68,23 +68,23 @@ public class AStar
 					    && _x <= map.row && _y <= map.column
 					    && map.gridMat [_x, _y] != null
 					    && map.gridMat [_x, _y].gameObject.activeSelf
-					    && map.gridMat [_x, _y].owner == null
+					    && map.gridMat [_x, _y].Owner == null
 					    && !closeList.Contains (map.gridMat [_x, _y])) {
 
 						//计算G值
-						int _g = _currentGrid.g + (int)(Mathf.Sqrt ((Mathf.Abs (i) + Mathf.Abs (j))) * 10);
+						int _g = _currentGrid.G + (int)(Mathf.Sqrt ((Mathf.Abs (i) + Mathf.Abs (j))) * 10);
 
 						//与原G值对照
-						if (map.gridMat [_x, _y].g == 0 || map.gridMat [_x, _y].g > _g) {
-							map.gridMat [_x, _y].g = _g;
-							map.gridMat [_x, _y].gridParent = _currentGrid;
+						if (map.gridMat [_x, _y].G == 0 || map.gridMat [_x, _y].G > _g) {
+							map.gridMat [_x, _y].G = _g;
+							map.gridMat [_x, _y].GridParent = _currentGrid;
 						}
 
 						//计算H值
-						map.gridMat [_x, _y].h = Manhattan (_x, _y, endGird.Vi.x, endGird.Vi.y);
+						map.gridMat [_x, _y].H = Manhattan (_x, _y, endGird.Vi.x, endGird.Vi.y);
 
 						//计算F值
-						map.gridMat [_x, _y].f = map.gridMat [_x, _y].g + map.gridMat [_x, _y].h;
+						map.gridMat [_x, _y].F = map.gridMat [_x, _y].G + map.gridMat [_x, _y].H;
 
 						if (!openList.Contains (map.gridMat [_x, _y])) {
 							openList.Add (map.gridMat [_x, _y]);
@@ -116,12 +116,12 @@ public class AStar
 	static void GenerateResult (Grid currentGrid)
 	{
 
-		if (currentGrid.gridParent != null) {
+		if (currentGrid.GridParent != null) {
 
 //			Debug.Log ("gridName:" + currentGrid.name);
 
 			resultGridStack.Push (currentGrid);
-			GenerateResult (currentGrid.gridParent);
+			GenerateResult (currentGrid.GridParent);
 		}
 
 	}

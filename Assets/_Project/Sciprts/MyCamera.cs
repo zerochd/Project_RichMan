@@ -212,4 +212,13 @@ public class MyCamera : MonoBehaviour
 		yield return null;
 	}
 
+
+	Vector3 localposition;
+	Vector3 localEuler;
+	public void BeSomeOneEye(Transform someOne){ 
+		StopAllCoroutines ();
+		this.transform.position = someOne.transform.position;
+		this.transform.rotation = someOne.transform.rotation;
+	}
+
 }

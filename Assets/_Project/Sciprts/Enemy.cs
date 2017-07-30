@@ -50,7 +50,7 @@ public sealed class Enemy : Actor {
 
 					Anim_Move ();
 
-					if (_nextMoveGrid.owner == null) {
+					if (_nextMoveGrid.Owner == null) {
 
 						MoveToGrid (_nextMoveGrid);
 					}

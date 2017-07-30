@@ -95,7 +95,7 @@ public sealed class Player : Actor
 
 					Anim_Move ();
 
-					if (_nextMoveGrid.owner == null) {
+					if (_nextMoveGrid.Owner == null) {
 						
 						MoveToGrid (_nextMoveGrid);
 					}
@@ -208,10 +208,10 @@ public sealed class Player : Actor
 	public void Fight (Actor other)
 	{
 		this.actorTransform.LookAt (other.ActorTransform.position, Vector3.up);
+		other.ActorTransform.LookAt (this.actorTransform.position,Vector3.up);
 		attackData = new AttackData (this, other, playerData.damage);
 		animator.SetInteger("AttackID",1);
 		animator.SetTrigger("once");
-
 
 	}
 
