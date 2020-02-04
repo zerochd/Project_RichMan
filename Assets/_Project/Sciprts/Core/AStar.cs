@@ -4,111 +4,139 @@ using UnityEngine;
 
 public class AStar
 {
+	private static readonly List<Grid> OpenList = new List<Grid> ();
+	private static readonly List<Grid> CloseList = new List<Grid> ();
 
-	public static List<Grid> openList = new List<Grid> ();
-	public static List<Grid> closeList = new List<Grid> ();
-
-	static Stack<Grid> resultGridStack = new Stack<Grid> ();
-
-
+	private static readonly Stack<Grid> ResultGridStack = new Stack<Grid> ();
+	
 	public static Stack<Grid> CalcPath (Grid startGrid, Grid endGird, Map map)
 	{
 		if (startGrid == null || endGird == null || map == null)
-			return resultGridStack;
+			return ResultGridStack;
 		
-		resultGridStack.Clear ();
-		openList.Clear ();
-		closeList.Clear ();
+		ResultGridStack.Clear ();
+		
+		//清空数据
+		foreach (var gd in OpenList) {
+			gd.ResetValue ();
+		}
+
+		foreach (var gd in CloseList) {
+			gd.ResetValue ();
+		}
+		
+		OpenList.Clear ();
+		CloseList.Clear ();
 
 		//添加起始点
-		openList.Add (startGrid);
-		Grid _currentGrid = startGrid;
+		OpenList.Add (startGrid);
+		var currentGrid = startGrid;
 
 		//循环遍历路径上最小F的点
-		while (openList.Count > 0 && _currentGrid != endGird) {
+        //循环条件：
+        //1.openlist > 0
+        //2.当前点并不是终点
+		while (OpenList.Count > 0 && currentGrid != endGird) {
 
-			_currentGrid = openList [0];
+            //设置当前查找的grid为openList[0]
+            //由于查找上下左右邻居点后，都会sort（）
+            //所以openList[0]为f值最小的点
+			currentGrid = OpenList [0];
 
-			if (_currentGrid == endGird) {
-//				Debug.Log ("find endGrid");
+            //当前查找的grid == 最终的目标grid
+			if (currentGrid == endGird) {
 
 				//生成结果
-				GenerateResult (_currentGrid);
+				GenerateResult (currentGrid);
 
-				//清空数据
-				foreach (Grid gd in openList) {
-					gd.ResetValue ();
-				}
+//				//清空数据
+//				foreach (var gd in OpenList) {
+//					gd.ResetValue ();
+//				}
+//
+//				foreach (var gd in CloseList) {
+//					gd.ResetValue ();
+//				}
 
-				foreach (Grid gd in closeList) {
-					gd.ResetValue ();
-				}
-
-				return resultGridStack;
+				return ResultGridStack;
 			}
 
-			//只计算上下左右
-			for (int i = -1; i <= 1; i++) {
-				for (int j = -1; j <= 1; j++) {
+			//只计算上下左右方向的邻居点
+			for (var i = -1; i <= 1; i++) {
+				for (var j = -1; j <= 1; j++) {
 					
 					//过滤斜角和自身
 					if (i == j || i == -j)
-						continue;
-					
-					//过滤自身
-//					if (i == 0 && j == 0)
-//						continue;
+						continue;		
 
-					//计算坐标
-					int _x = _currentGrid.Vi.x + i;
-					int _y = _currentGrid.Vi.y + j;
+					//计算每个邻居的坐标
+					var x = currentGrid.Vi.x + i;
+					var y = currentGrid.Vi.y + j;
 
-					//没有超出地图范围，不是空的，不是重复点
-					if (_x >= 0 && _y >= 0
-					    && _x <= map.row && _y <= map.column
-					    && map.gridMat [_x, _y] != null
-					    && map.gridMat [_x, _y].gameObject.activeSelf
-					    && map.gridMat [_x, _y].Owner == null
-					    && !closeList.Contains (map.gridMat [_x, _y])) {
+                    //没有超出地图范围
+                    var mInMapArea = (x >= 0 && y >= 0 && x <= (map.Edge.x - 1) && y <= (map.Edge.y - 1));
+                    if (!mInMapArea)
+                        continue;
+
+                    //点是合法的
+                    var mGridValid = (map.gridMat[x, y] != null
+                        && map.gridMat[x, y].gameObject.activeSelf
+                        && map.gridMat[x, y].Owner == null);
+
+                    //点未到达的
+                    var mNotInCloseList = !CloseList.Contains(map.gridMat[x, y]);
+
+                    if (mGridValid     
+                        && mNotInCloseList) {
 
 						//计算G值
-						int _g = _currentGrid.G + (int)(Mathf.Sqrt ((Mathf.Abs (i) + Mathf.Abs (j))) * 10);
+						var _g = currentGrid.G + (int)(Mathf.Sqrt ((Mathf.Abs (i) + Mathf.Abs (j))) * 10);
 
 						//与原G值对照
-						if (map.gridMat [_x, _y].G == 0 || map.gridMat [_x, _y].G > _g) {
-							map.gridMat [_x, _y].G = _g;
-							map.gridMat [_x, _y].GridParent = _currentGrid;
+                        //如果小于原G值或者原G值 == 0
+                        //覆盖该邻居点的G值，然后将该邻居点的GridParent设置为当前点
+						if (map.gridMat [x, y].G == 0 || map.gridMat [x, y].G > _g) {
+							map.gridMat [x, y].G = _g;
+							map.gridMat [x, y].GridParent = currentGrid;
 						}
 
-						//计算H值
-						map.gridMat [_x, _y].H = Manhattan (_x, _y, endGird.Vi.x, endGird.Vi.y);
+						//计算该邻居点的H值
+						map.gridMat [x, y].H = Manhattan (x, y, endGird.Vi.x, endGird.Vi.y);
 
-						//计算F值
-						map.gridMat [_x, _y].F = map.gridMat [_x, _y].G + map.gridMat [_x, _y].H;
+						//计算该邻居点的F值
+						map.gridMat [x, y].F = map.gridMat [x, y].G + map.gridMat [x, y].H;
 
-						if (!openList.Contains (map.gridMat [_x, _y])) {
-							openList.Add (map.gridMat [_x, _y]);
+                        //如果openList没有该邻居点的话
+                        //将该邻居点加入到openList中去
+						if (!OpenList.Contains (map.gridMat [x, y])) {
+							OpenList.Add (map.gridMat [x, y]);
 						}
 
 						//重新排序
-						openList.Sort ();
+                        //可以优化
+						OpenList.Sort ();
 					}
 				}
 			}
 
-			//完成遍历添加该点进入关闭列表
-			closeList.Add (_currentGrid);
-			//从开启列表删除
-			openList.Remove (_currentGrid);
+			//完成遍历添加当前点进入关闭列表
+			CloseList.Add (currentGrid);
+			//并从openList中移除该grid点
+			OpenList.Remove (currentGrid);
 
 			//如果开启列表为空，未能找到路径
-			if (openList.Count == 0) {
-				Debug.Log ("Can not find");
+			if (OpenList.Count == 0) {
+				Debug.LogError ("Can not find");
+				
+//				foreach (Grid gd in CloseList) {
+//					gd.ResetValue ();
+//				}
 			}
 		}
-		return resultGridStack;
+		return ResultGridStack;
 	}
-
+	
+	
 	/// <summary>
 	/// 生成结果
 	/// </summary>
@@ -117,10 +145,8 @@ public class AStar
 	{
 
 		if (currentGrid.GridParent != null) {
-
-//			Debug.Log ("gridName:" + currentGrid.name);
-
-			resultGridStack.Push (currentGrid);
+			
+			ResultGridStack.Push (currentGrid);
 			GenerateResult (currentGrid.GridParent);
 		}
 

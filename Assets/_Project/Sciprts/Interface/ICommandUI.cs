@@ -6,11 +6,11 @@ public interface ICommandUI {
 
 	int UseTime{ get; set; }
 
-	void InitUI(Player controllerPlayer);
+	void InitUi(Player controllerPlayer);
 
-	bool CanExcute ();
+	bool CanExecute ();
 
-	void Excute();
+	void Execute();
 
 	void EnableCommand ();
 

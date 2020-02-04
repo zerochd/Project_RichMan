@@ -87,7 +87,7 @@ public class MapEditor : Editor {
 
 			if(button_clear){
 
-				bool isYes = EditorUtility.DisplayDialog("Clear WayPoint","Are you sure Delete All WayPoint?","Yes","No");
+				bool isYes = EditorUtility.DisplayDialog("Clear Map","Are you sure Delete Map?","Yes","No");
 
 				if(isYes){
 
@@ -213,18 +213,20 @@ public class MapEditor : Editor {
 				if (map.GetGridPrefab () != null) {
 
 //					GameObject _go = Instantiate (map.GetGridPrefab ());
-					GameObject _go = PrefabUtility.InstantiatePrefab (map.GetGridPrefab ()) as GameObject;
-					_go.transform.position = CurrentHandlePosition + Vector3.up * 0.5f;
+					var go = PrefabUtility.InstantiatePrefab (map.GetGridPrefab ()) as GameObject;
+					if (go != null)
+					{
+						go.transform.position = CurrentHandlePosition + Vector3.up * 0.5f;
 //				_go.transform.localEulerAngles = Vector3.up * angle;
 
-					_go.transform.SetParent (map.transform);
-					_go.name = _go.name.Replace ("(Clone)", "") + _go.transform.GetSiblingIndex ();
-					_go.transform.localScale = Vector3.one;
+						go.transform.SetParent(map.transform);
+						go.name = go.name.Replace("(Clone)", "") + go.transform.GetSiblingIndex();
+						go.transform.localScale = Vector3.one;
 
-					Undo.RegisterCreatedObjectUndo (_go, "Create go");
+						Undo.RegisterCreatedObjectUndo(go, "Create go");
 
-					EditorUtility.SetDirty (_go);
-
+						EditorUtility.SetDirty(go);
+					}
 				} else {
 					
 					EditorUtility.DisplayDialog ("Warning", "MovePointPrefab is missing", "ok");
@@ -239,14 +241,14 @@ public class MapEditor : Editor {
 
 	}
 
-	static void DrawHandlesPreview(){
-		Color _handleColor = Color.green;
+	private static void DrawHandlesPreview(){
+		var handleColor = Color.green;
 
 		if (Event.current.shift == true && hoverGrid != null) {
-			_handleColor = Color.red;
+			handleColor = Color.red;
 		}
 
-		Handles.color = _handleColor;
+		Handles.color = handleColor;
 		DrawHandle(CurrentHandlePosition);
 	}
 
@@ -254,15 +256,15 @@ public class MapEditor : Editor {
 
 
 
-		Vector3 p1 = center + Vector3.up * 0.5f + Vector3.right * 2f + Vector3.forward * 2f;
-		Vector3 p2 = center + Vector3.up * 0.5f + Vector3.right * 2f - Vector3.forward * 2f;
-		Vector3 p3 = center + Vector3.up * 0.5f - Vector3.right * 2f - Vector3.forward * 2f;
-		Vector3 p4 = center + Vector3.up * 0.5f - Vector3.right * 2f + Vector3.forward * 2f;
+		var p1 = center + Vector3.up * 0.5f + Vector3.right * 2f + Vector3.forward * 2f;
+		var p2 = center + Vector3.up * 0.5f + Vector3.right * 2f - Vector3.forward * 2f;
+		var p3 = center + Vector3.up * 0.5f - Vector3.right * 2f - Vector3.forward * 2f;
+		var p4 = center + Vector3.up * 0.5f - Vector3.right * 2f + Vector3.forward * 2f;
 
-		Vector3 p5 = center - Vector3.up * 0.5f + Vector3.right * 2f + Vector3.forward * 2f;
-		Vector3 p6 = center - Vector3.up * 0.5f + Vector3.right * 2f - Vector3.forward * 2f;
-		Vector3 p7 = center - Vector3.up * 0.5f - Vector3.right * 2f - Vector3.forward * 2f;
-		Vector3 p8 = center - Vector3.up * 0.5f - Vector3.right * 2f + Vector3.forward * 2f;
+		var p5 = center - Vector3.up * 0.5f + Vector3.right * 2f + Vector3.forward * 2f;
+		var p6 = center - Vector3.up * 0.5f + Vector3.right * 2f - Vector3.forward * 2f;
+		var p7 = center - Vector3.up * 0.5f - Vector3.right * 2f - Vector3.forward * 2f;
+		var p8 = center - Vector3.up * 0.5f - Vector3.right * 2f + Vector3.forward * 2f;
 
 		Handles.DrawLine( p1, p2 );
 		Handles.DrawLine( p2, p3 );

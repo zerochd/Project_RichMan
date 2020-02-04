@@ -17,13 +17,6 @@ public class AstarTest : MonoBehaviour {
 
 	[SerializeField] STATE state = STATE.SELECT_START;
 
-//	public Grid StartGrid {
-//		get {
-//			return startGrid;
-//		}
-//	}
-
-
 	// Update is called once per frame
 	void Update () {
 		switch (state) {
@@ -32,7 +25,7 @@ public class AstarTest : MonoBehaviour {
 				if (!Input.GetMouseButtonDown (0))
 					return;
 
-				Ray _ray = Camera.main.ScreenPointToRay (Input.mousePosition);
+				var _ray = Camera.main.ScreenPointToRay (Input.mousePosition);
 				RaycastHit _hit = new RaycastHit ();
 				if (Physics.Raycast (_ray, out _hit, 1000.0f, 1 << LayerMask.NameToLayer ("Grid"))) {
 					Grid _grid = _hit.collider.GetComponentInParent<Grid> ();

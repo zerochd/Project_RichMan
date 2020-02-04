@@ -52,7 +52,7 @@ public class ActorController : MonoBehaviour {
 			actorList.Remove (actor);
 		}
 		if (actorList.Count <= 0) {
-			GameManager.Instance.CheckGameOver (this);
+			MainGameManager.Instance.CheckGameOver (this);
 		}
 	}
 

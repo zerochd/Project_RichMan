@@ -4,30 +4,23 @@ using UnityEngine;
 using UnityEditor;
 
 public class Map : MonoBehaviour {
+	
+	private const string GridPath = "Assets/_Project/Prefab/GridPrefab";
 
-	const string GRID_PATH = "Assets/_Project/Prefab/GridPrefab";
-
-	public int row = 9;
-	public int column = 9; 
-
-	[SerializeField] GameObject gridPrefab;
-	[SerializeField] Grid[] grids;
-
-	[SerializeField] VectorInt2 edge;
-
-	public VectorInt2 Edge {
-		get {
-			return edge;
-		}
-	}
+	[SerializeField] private VectorInt2 edge;
+	
+	[SerializeField] private GameObject gridPrefab;
+	[SerializeField] private Grid[] grids;
+	
+	public VectorInt2 Edge => edge;
 
 	public Grid[,] gridMat;
 
-	void Start(){
+	private void Start(){
 		Init ();
 
 		gridMat = new Grid[edge.x,edge.y];
-		foreach (Grid grid in grids) {
+		foreach (var grid in grids) {
 			gridMat [grid.Vi.x, grid.Vi.y] = grid;
 		}
 	}
@@ -39,7 +32,7 @@ public class Map : MonoBehaviour {
 
 		grids = GetComponentsInChildren<Grid> ();
 
-		foreach (Grid grid in grids) {
+		foreach (var grid in grids) {
 			grid.Init ();
 			if (edge < grid.Vi) {
 				edge = grid.Vi;
@@ -50,7 +43,7 @@ public class Map : MonoBehaviour {
 	}
 
 	public void ResetColor(){
-		foreach (Grid grid in grids) {
+		foreach (var grid in grids) {
 			grid.ResetGridColor ();
 		}
 	}
@@ -59,8 +52,9 @@ public class Map : MonoBehaviour {
 
 		Init ();
 
-		foreach (Grid gd in grids) {
-			DestroyImmediate (gd.gameObject);
+		foreach (var gd in grids)
+		{
+			Undo.DestroyObjectImmediate(gd.gameObject);
 		}
 
 		grids = new Grid[0];
@@ -71,20 +65,5 @@ public class Map : MonoBehaviour {
 		return gridPrefab;
 	}
 
-//	[ContextMenu("SetNextGridBatch")]
-//	void SetNextGridBatch(){
-//		for (int i = 0; i < girds.Length -1; i++) {
-//			girds [i].ConnectGrid (girds [i + 1]);
-//		}
-//	}
-
-//	public Grid GetNextGrid(int nextIndex){
-//		
-//		if (nextIndex >= 0 && nextIndex < girds.Length) {
-//			return girds [nextIndex];
-//		}
-//
-//		return null;
-//	}
 
 }

@@ -162,8 +162,8 @@ public class EnemyController : ActorController {
 
 		if (enemyDoneNum >= actorList.Count) {
 			enemyDoneNum = 0;
-			if(GameManager.Instance != null){
-				GameManager.Instance.RoundEndActorController(this);
+			if(MainGameManager.Instance != null){
+				MainGameManager.Instance.RoundEndActorController(this);
 			}
 		} else {
 			RoundNextEnemy (nowEnemy);

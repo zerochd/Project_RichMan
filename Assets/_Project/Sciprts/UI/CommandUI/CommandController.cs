@@ -55,7 +55,7 @@ public class CommandController : MonoBehaviour {
 	public void UpdateUI(Player controlPlayer){
 		
 		foreach (var commandUI in iCommandUIArray) {
-			commandUI.InitUI (controlPlayer);
+			commandUI.InitUi (controlPlayer);
 		}
 
 		ShowUI ();

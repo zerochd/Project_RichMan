@@ -88,7 +88,7 @@ public class MyCamera : MonoBehaviour
 
 	void MoveCamera_LockTarget ()
 	{
-		Transform targetTransform = GameManager.Instance.NowControler.PlayerEntity.ActorTransform;
+		Transform targetTransform = MainGameManager.Instance.NowControler.PlayerEntity.ActorTransform;
 
 		//-------ROTATION----------
 

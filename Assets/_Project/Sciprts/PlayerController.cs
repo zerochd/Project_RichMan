@@ -454,8 +454,8 @@ public class PlayerController : ActorController
 		//如果所有人都结束了换下一波势力
 		if (playerDoneNum >= actorList.Count) {
 			playerDoneNum = 0;
-			if(GameManager.Instance != null){
-				GameManager.Instance.RoundEndActorController(this);
+			if(MainGameManager.Instance != null){
+				MainGameManager.Instance.RoundEndActorController(this);
 			}
 			if (CommandController.Instance != null) {
 				CommandController.Instance.HideUI ();

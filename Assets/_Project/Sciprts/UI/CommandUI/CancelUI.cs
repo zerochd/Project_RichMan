@@ -18,14 +18,14 @@ public class CancelUI : MonoBehaviour,ICommandUI {
 		{
 			eventButton.onClick.AddListener (delegate {
 				
-				Excute();
+				Execute();
 			});
 		}
 	}
 
 	#region ICommandUI implementation
 
-	public void InitUI (Player controllerPlayer)
+	public void InitUi (Player controllerPlayer)
 	{
 //		if (controllerPlayer == null) {
 //
@@ -44,13 +44,13 @@ public class CancelUI : MonoBehaviour,ICommandUI {
 		}
 	}
 
-	public bool CanExcute ()
+	public bool CanExecute ()
 	{
 		if (PlayerController.Instance.Command != COMMAND.NONE)
 			return true;
 		return false;
 	}
-	public void Excute ()
+	public void Execute ()
 	{
 
 		if (PlayerController.Instance == null)

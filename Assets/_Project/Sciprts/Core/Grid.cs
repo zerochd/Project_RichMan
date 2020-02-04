@@ -66,95 +66,54 @@ public struct VectorInt2{
 public class Grid : MonoBehaviour,IComparable<Grid> {
 
 
-	[SerializeField] VectorInt2 vi;
-	[SerializeField] GirdEvent gridEvent; 
+	[SerializeField] private VectorInt2 vi;
+	[SerializeField] private GirdEvent gridEvent;
 
-	int f;
-	int g;
-	int h;
-
-	Grid gridParent;
-	Actor owner;
 	public Color lastColor = Color.white;
 
-	public int F {
-		get {
-			return f;
-		}
-		set {
-			f = value;
-		}
-	}
+	public int F { get; set; }
 
-	public int G {
-		get {
-			return g;
-		}
-		set {
-			g = value;
-		}
-	}
+	public int G { get; set; }
 
-	public int H {
-		get {
-			return h;
-		}
-		set {
-			h = value;
-		}
-	}
+	public int H { get; set; }
 
-	public Grid GridParent {
-		get {
-			return gridParent;
-		}
-		set {
-			gridParent = value;
-		}
-	}
+	public Grid GridParent { get; set; }
 
-	public Actor Owner {
-		get {
-			return owner;
-		}
-	}
-		
+	public Actor Owner { get; private set; }
 
-	public VectorInt2 Vi {
-		get {
-			return vi;
-		}
-	}
+
+	public VectorInt2 Vi => vi;
 
 	public void Init()
 	{
-		vi.x = Mathf.RoundToInt(this.transform.position.x / 4);
-		vi.y = Mathf.RoundToInt(this.transform.position.z / 4);
+		var position = this.transform.position;
+		vi.x = Mathf.RoundToInt(position.x / 4);
+		vi.y = Mathf.RoundToInt(position.z / 4);
 		ResetValue ();
 
 	}
 
 	public void ResetGridColor(){
-		if (owner == null) 
+		if (Owner == null) 
 			SetGridColor (Color.white);
 	}
 
 	public void SetGridColor(Color color){
-		Material _mat = GetComponentInChildren<MeshRenderer> ().material;
-		lastColor = _mat.color;
-		_mat.color = color;
+		var mat = GetComponentInChildren<MeshRenderer> ().material;
+		lastColor = mat.color;
+		mat.color = color;
 	}
 
 	public void ResetValue(){
-		gridParent = null;
-		f = 0;
-		g = 0;
-		h = 0;
+		GridParent = null;
+		F = 0;
+		G = 0;
+		H = 0;
 	}
 
 	public virtual bool Arrived(Actor actor){
-		if (owner == null) {
-			owner = actor;
+		if (Owner == null) {
+			Owner = actor;
 
 			GetComponentInChildren<MeshRenderer> ().material.color = Color.red;
 
@@ -170,9 +129,9 @@ public class Grid : MonoBehaviour,IComparable<Grid> {
 
 	public virtual void Free(){
 
-		if(owner != null)
+		if(Owner != null)
 			GetComponentInChildren<MeshRenderer> ().material.color = Color.white;
-		owner = null;
+		Owner = null;
 	}
 
 	#region IComparable implementation
@@ -180,15 +139,11 @@ public class Grid : MonoBehaviour,IComparable<Grid> {
 	public int CompareTo (Grid other)
 	{
 
-		if (this.f < other.f) {
+		if (this.F < other.F) {
 			//升序
 			return -1;
 		}
-		if (this.f > other.f) {
-			//降序
-			return 1;
-		}
-		return 0;
+		return this.F > other.F ? 1 : 0;
 	}
 
 	#endregion
@@ -198,6 +153,16 @@ public class Grid : MonoBehaviour,IComparable<Grid> {
 	void OnDrawGizmos(){
 
 		UnityEditor.Handles.Label (this.transform.position, "(" + vi.x + "," + vi.y + ")");
+
+		if (GridParent != null)
+		{
+			UnityEditor.Handles.DrawDottedLine(
+				this.transform.position + Vector3.up *0.1f,
+					GridParent.transform.position + Vector3.up* 0.5f,
+				1f
+				);
+		}
+		
 //		UnityEditor.Handles.color = Color.green;
 //
 //		if (h != 0)

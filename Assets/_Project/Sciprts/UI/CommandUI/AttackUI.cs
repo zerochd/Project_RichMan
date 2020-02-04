@@ -20,14 +20,14 @@ public class AttackUI : MonoBehaviour,ICommandUI {
 		{
 			eventButton.onClick.AddListener (delegate {
 //				Debug.Log("click");
-				Excute();
+				Execute();
 			});
 		}
 	}
 
 	#region ICommandUI implementation
 
-	public void InitUI (Player controllerPlayer)
+	public void InitUi (Player controllerPlayer)
 	{
 		if (controllerPlayer == null) {
 
@@ -47,20 +47,20 @@ public class AttackUI : MonoBehaviour,ICommandUI {
 		}
 	}
 
-	public bool CanExcute ()
+	public bool CanExecute ()
 	{
 		if (PlayerController.Instance.Command != COMMAND.DONE 
 			&& PlayerController.Instance.Command != COMMAND.DOING)
 			return true;
 		return false;
 	}
-	public void Excute ()
+	public void Execute ()
 	{
 
 		if (PlayerController.Instance == null)
 			return;
 
-		if (!CanExcute())
+		if (!CanExecute())
 			return;
 
 		if (CommandController.Instance != null) {
